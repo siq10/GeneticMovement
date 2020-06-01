@@ -3073,6 +3073,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a51ead0bfec3fe4ab9ce6cd38f613b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TerrainList:
+  - Terrain
 --- !u!1 &1852081166 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100010, guid: 6996385895b383749b266464bf872c69,

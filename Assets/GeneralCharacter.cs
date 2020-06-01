@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class GeneralCharacter : MonoBehaviour
 {
+    //17 movable rigidbodies
+
+    [SerializeField]
+    public List<string> TerrainList = new List<string>();
+
     private Rigidbody headrb;
-    Transform[] allchildren;
+    Transform[] allchildren; 
     float distToGround;
     List<GameObject> limbs = new List<GameObject>();
     // Start is called before the first frame update
@@ -43,6 +49,7 @@ public class GeneralCharacter : MonoBehaviour
     }
     void RandomMovement()
     {
+        int count = 0;
         for (int i = 1; i < allchildren.Length; i++)
         {
             //Debug.Log(allchildren[i].name);
@@ -51,22 +58,15 @@ public class GeneralCharacter : MonoBehaviour
 
             if (rb)
             {
-                //Debug.Log(allchildren[i].name);
-               
+                count++;
+                
                 HorizontalMovement(rb);
-                //break;
                 VerticalMovement(rb);
-                /*transform.eulerAngles = new Vector3(transform.eulerAngles.x, Random.Range(0, 360), transform.eulerAngles.z);
-                float speed = 600;
-                rigidBody.isKinematic = false;
-                Vector3 force = transform.forward;
-                force = new Vector3(force.x, 1, force.z);
-                rigidBody.AddForce(force * speed);
-                rb.AddForce();*/
             }
 
             //child is your child transform
         }
+
     }
 
     bool IsGrounded()
@@ -74,10 +74,23 @@ public class GeneralCharacter : MonoBehaviour
         bool result = false;
         for (var i = 0; i < limbs.Count; i++)
         {
-            if(Physics.Raycast(limbs[i].transform.position, -Vector3.up, limbs[i].GetComponent<Collider>().bounds.extents.y + 0.1f))
-            result = true ;
-            Debug.Log(limbs[i].name + " is on the ground!");
-            break;
+            RaycastHit[] hits;
+            hits = Physics.RaycastAll(limbs[i].transform.position, new Vector3(0, -1, 0), limbs[i].GetComponent<Collider>().bounds.extents.y + 0.1f);
+            for (int j = 0; j < hits.Length; j++)
+            {
+                if(TerrainList.Contains(hits[j].transform.name) )
+                {
+                    Debug.DrawRay(limbs[i].transform.position, new Vector3(0, -1, 0) * (limbs[i].GetComponent<Collider>().bounds.extents.y + 0.1f), Color.red);
+
+                    result = true;
+                    Debug.Log(hits[j].transform.name + " is " + hits[j].distance + " units away from " + limbs[i].name);
+                    break;
+                }
+            }
+            if(result == true)
+            {
+                break;
+            }
         }
         return result;
 
