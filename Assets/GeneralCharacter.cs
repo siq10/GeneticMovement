@@ -6,7 +6,13 @@ using UnityEngine;
 public class GeneralCharacter : MonoBehaviour
 {
     //17 movable rigidbodies
+    private List<Vector3> HorizontalMovementDNA = new List<Vector3>();
+    private List<Vector3> torqueDNA = new List<Vector3>();
+    private List<float> VerticalMovementDNA = new List<float>();
 
+    private int ChromosomeLength = 50;
+    // horizontal,vertical,torque
+    // vector3 * DNAlength
     [SerializeField]
     public List<string> TerrainList = new List<string>();
 
@@ -14,10 +20,22 @@ public class GeneralCharacter : MonoBehaviour
     Transform[] allchildren; 
     float distToGround;
     List<GameObject> limbs = new List<GameObject>();
-    // Start is called before the first frame update
+
+    public void SetDNA(List<Vector3> horizontalMovement, List<float> verticalMovement, List<Vector3> torque)
+    {
+        HorizontalMovementDNA.AddRange(horizontalMovement);
+        VerticalMovementDNA.AddRange(verticalMovement);
+        torqueDNA.AddRange(torque);
+    }
+    public void SetChromosomeLength(int length)
+    {
+        ChromosomeLength = length;
+    }
+
     void Start()
     {
         allchildren = transform.GetComponentsInChildren<Transform>(true);
+
         for (int i = 0; i < allchildren.Length; i++)
         {
             if (allchildren[i].CompareTag("CHead"))

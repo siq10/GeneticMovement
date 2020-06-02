@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Assets\CameraFollow.cs" />
     <Compile Include="Assets\GeneralCharacter.cs" />
+    <Compile Include="Assets\PopulationControlller.cs" />
     <None Include="Assets\BodyGuards\ReadMe.txt.txt" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Info/GeneticMotion/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
