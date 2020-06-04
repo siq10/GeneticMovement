@@ -61,7 +61,7 @@ public class GeneralCharacter : MonoBehaviour
     void FixedUpdate()
     {
 
-        RandomMovement();
+        //RandomMovement();
         //Debug.Log(GetHeadYcoordinate());
 
     }
@@ -70,12 +70,12 @@ public class GeneralCharacter : MonoBehaviour
         int count = 0;
         for (int i = 1; i < allchildren.Length; i++)
         {
-            //Debug.Log(allchildren[i].name);
 
             var rb = allchildren[i].GetComponent<Rigidbody>();
 
             if (rb)
             {
+                //Debug.Log(allchildren[i].name);
                 count++;
                 
                 HorizontalMovement(rb);
@@ -132,6 +132,21 @@ public class GeneralCharacter : MonoBehaviour
     float GetHeadYcoordinate()
     {
         return headrb.position.y;
+    }
+
+
+    public List<Collider> GetAllColliders()
+    {
+        List<Collider> result = new List<Collider>();
+        var allchildren = transform.GetComponentsInChildren<Transform>(true);
+        for (int j = 0; j < allchildren.Length; j++)
+        {
+            if (GetComponent<Collider>() != null)
+            {
+                result.Add(allchildren[j].GetComponent<Collider>());
+            }
+        }
+        return result;
     }
 
 }

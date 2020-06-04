@@ -67,6 +67,7 @@
     <Compile Include="Assets\GeneralCharacter.cs" />
     <Compile Include="Assets\PopulationControlller.cs" />
     <None Include="Assets\BodyGuards\ReadMe.txt.txt" />
+    <None Include="Assets\MyAssets\Shaders\start.shader" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Info/GeneticMotion/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
