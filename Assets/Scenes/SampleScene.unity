@@ -1459,9 +1459,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CharacterType: {fileID: 2784716949808296471, guid: aea450a8890ca5e468355c76b1d2509e,
     type: 3}
-  PopulationSize: 50
+  PopulationSize: 10
   MaxRunTime: 20
-  AppliedForcesCount: 500
+  AppliedStimulusCount: 500
   InitialLocation: {fileID: 579207449}
   DesiredLocation: {fileID: 2074655990}
 --- !u!4 &1480641281
@@ -2090,6 +2090,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Smith
+      objectReference: {fileID: 0}
+    - target: {fileID: 2784716949808296471, guid: aea450a8890ca5e468355c76b1d2509e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aea450a8890ca5e468355c76b1d2509e, type: 3}

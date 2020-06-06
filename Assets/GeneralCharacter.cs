@@ -1,27 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml.XPath;
 using UnityEngine;
 
 [System.Serializable]
 public class GeneralCharacter : MonoBehaviour
 {
     //17 movable rigidbodies
-    private List<Vector3> HorizontalMovementDNA = new List<Vector3>();
-    private List<Vector3> torqueDNA = new List<Vector3>();
-    private List<float> VerticalMovementDNA = new List<float>();
-
-    private int ChromosomeLength = 50;
+    private List<List<Vector3>> HorizontalMovementDNA = new List<List<Vector3>>();
+    private List<List<Vector3>> torqueDNA = new List<List<Vector3>>();
+    private List<List<float>> VerticalMovementDNA = new List<List<float>>();
+    private List<Rigidbody> allrigidbodies = new List<Rigidbody>();
+    private int stage = 0;
+    private int ChromosomeLength = 500;
     // horizontal,vertical,torque
     // vector3 * DNAlength
     [SerializeField]
     public List<string> TerrainList = new List<string>();
 
+    public bool started = false, finished = false;
+
     private Rigidbody headrb;
-    Transform[] allchildren; 
+    Transform[] allchildren = { };
+    private List<Collider> allcolliders = new List<Collider>();
     float distToGround;
     List<GameObject> limbs = new List<GameObject>();
 
-    public void SetDNA(List<Vector3> horizontalMovement, List<float> verticalMovement, List<Vector3> torque)
+    public void SetDNA(List<List<Vector3>> horizontalMovement, List<List<float>> verticalMovement, List<List<Vector3>> torque)
     {
         HorizontalMovementDNA.AddRange(horizontalMovement);
         VerticalMovementDNA.AddRange(verticalMovement);
@@ -34,9 +39,8 @@ public class GeneralCharacter : MonoBehaviour
 
     void Start()
     {
-        allchildren = transform.GetComponentsInChildren<Transform>(true);
 
-        for (int i = 0; i < allchildren.Length; i++)
+        for (int i = 0; i < GetChildren().Length; i++)
         {
             if (allchildren[i].CompareTag("CHead"))
             {
@@ -60,12 +64,22 @@ public class GeneralCharacter : MonoBehaviour
     }
     void FixedUpdate()
     {
-
+        if(started && !finished)
+        {
+            for(int i =0; i< GetRigidBodies().Count;i++)
+            {
+                HorizontalMovement(allrigidbodies[i], HorizontalMovementDNA[stage][i], torqueDNA[stage][i]);
+                VerticalMovement(allrigidbodies[i], VerticalMovementDNA[stage][i]);
+            }
+            stage++;
+            if (stage == ChromosomeLength)
+                finished = true;
+        }
         //RandomMovement();
         //Debug.Log(GetHeadYcoordinate());
 
     }
-    void RandomMovement()
+    /*void RandomMovement()
     {
         int count = 0;
         for (int i = 1; i < allchildren.Length; i++)
@@ -85,8 +99,31 @@ public class GeneralCharacter : MonoBehaviour
             //child is your child transform
         }
 
-    }
+    }*/
+    public List<Rigidbody> GetRigidBodies()
+    {
+        if (allrigidbodies.Count == 0)
+        {
+            for (int i = 1; i < GetChildren().Length; i++)
+            {
+                var rb = allchildren[i].GetComponent<Rigidbody>();
+                if (rb)
+                {
+                    allrigidbodies.Add(rb);
+                }
+            }
+        }
+        return allrigidbodies;
 
+    }
+    public Transform[] GetChildren()
+    {
+        if (allchildren.Length == 0)
+        {
+            allchildren = transform.GetComponentsInChildren<Transform>(true);
+        }
+        return allchildren;
+    }
     bool IsGrounded()
     {
         bool result = false;
@@ -113,20 +150,16 @@ public class GeneralCharacter : MonoBehaviour
         return result;
 
     }
-    void HorizontalMovement(Rigidbody rb)
+    void HorizontalMovement(Rigidbody rb, Vector3 horizontalforces, Vector3 torque)
     {
-        Vector3 torque;
-        torque.x = Random.Range(-10, 10);
-        torque.y = Random.Range(-10, 10);
-        torque.z = Random.Range(-10, 10);
         rb.AddTorque(torque);
-        rb.AddForce(Vector3.Scale(new Vector3(1, 1, 1), new Vector3(Random.Range(-1000f, 1000f), Random.Range(-100f, 100f), Random.Range(-1000f, 1000f))), ForceMode.Force);
+        rb.AddForce(Vector3.Scale(new Vector3(1, 1, 1), horizontalforces), ForceMode.Force);
     }
-    void VerticalMovement(Rigidbody rb)
+    void VerticalMovement(Rigidbody rb, float verticalforce)
     {
         if(IsGrounded())
         {
-            rb.AddForce(new Vector3(0, 1, 0) * Random.Range(-1000f, 1000f));
+            rb.AddForce(new Vector3(0, 1, 0) * verticalforce);
         }
     }
     float GetHeadYcoordinate()
@@ -138,15 +171,26 @@ public class GeneralCharacter : MonoBehaviour
     public List<Collider> GetAllColliders()
     {
         List<Collider> result = new List<Collider>();
-        var allchildren = transform.GetComponentsInChildren<Transform>(true);
-        for (int j = 0; j < allchildren.Length; j++)
+        if(allcolliders.Count == 0)
         {
-            if (GetComponent<Collider>() != null)
+            for (int j = 0; j < GetChildren().Length; j++)
             {
-                result.Add(allchildren[j].GetComponent<Collider>());
+                if (allchildren[j].GetComponent<Collider>() != null)
+                {
+                    result.Add(allchildren[j].GetComponent<Collider>());
+                }
             }
+            allcolliders = result;
+        }
+        else
+        {
+            result = allcolliders;
         }
         return result;
+    }
+    public void Act()
+    {
+        started = true;
     }
 
 }
