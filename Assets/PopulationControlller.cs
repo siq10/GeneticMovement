@@ -75,8 +75,12 @@ public class PopulationControlller : MonoBehaviour
     }
     private void ResetState()
     {
+        for (int i = 0; i < PopulationSize; i++)
+        { 
 
-    }
+        }
+
+     }
     private void IgnoreCollisionsBetween(List<Collider> allcollidersX, List<Collider> allcollidersY)
     {
         int listsize = allcollidersX.Count;

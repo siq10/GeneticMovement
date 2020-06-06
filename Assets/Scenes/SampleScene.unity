@@ -546,7 +546,7 @@ GameObject:
   - component: {fileID: 509306874}
   m_Layer: 0
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: p
   m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1203,13 +1203,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.2826282, y: 0.094646856, z: -0.028035672, w: 0.95413697}
-  m_LocalPosition: {x: 2.82, y: 14.72, z: -4.08}
+  m_LocalRotation: {x: 0.24097167, y: 0.07360069, z: -0.018330244, w: 0.9675638}
+  m_LocalPosition: {x: 11.62, y: 8.7, z: -2.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 33, y: 11.33, z: 0}
+  m_LocalEulerAnglesHint: {x: 27.97, y: 8.7, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1459,7 +1459,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CharacterType: {fileID: 2784716949808296471, guid: aea450a8890ca5e468355c76b1d2509e,
     type: 3}
-  PopulationSize: 10
+  PopulationSize: 50
   MaxRunTime: 20
   AppliedStimulusCount: 500
   InitialLocation: {fileID: 579207449}

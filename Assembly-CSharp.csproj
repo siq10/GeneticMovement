@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Assets\CameraFollow.cs" />
     <Compile Include="Assets\GeneralCharacter.cs" />
+    <Compile Include="Assets\MyAssets\Scripts\CatchCollision.cs" />
     <Compile Include="Assets\PopulationControlller.cs" />
     <None Include="Assets\BodyGuards\ReadMe.txt.txt" />
     <None Include="Assets\MyAssets\Shaders\start.shader" />

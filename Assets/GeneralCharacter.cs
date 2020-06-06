@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Xml.XPath;
+using TMPro;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 [System.Serializable]
@@ -13,6 +15,8 @@ public class GeneralCharacter : MonoBehaviour
     private List<Rigidbody> allrigidbodies = new List<Rigidbody>();
     private int stage = 0;
     private int ChromosomeLength = 500;
+
+    private bool grounded = true;
     // horizontal,vertical,torque
     // vector3 * DNAlength
     [SerializeField]
@@ -129,26 +133,14 @@ public class GeneralCharacter : MonoBehaviour
         bool result = false;
         for (var i = 0; i < limbs.Count; i++)
         {
-            RaycastHit[] hits;
-            hits = Physics.RaycastAll(limbs[i].transform.position, new Vector3(0, -1, 0), limbs[i].GetComponent<Collider>().bounds.extents.y + 0.1f);
-            for (int j = 0; j < hits.Length; j++)
+            CatchCollision c = limbs[i].GetComponent<CatchCollision>();
+            if (c.grounded)
             {
-                if(TerrainList.Contains(hits[j].transform.name) )
-                {
-                    Debug.DrawRay(limbs[i].transform.position, new Vector3(0, -1, 0) * (limbs[i].GetComponent<Collider>().bounds.extents.y + 0.1f), Color.red);
-
-                    result = true;
-                    Debug.Log(hits[j].transform.name + " is " + hits[j].distance + " units away from " + limbs[i].name);
-                    break;
-                }
-            }
-            if(result == true)
-            {
+                result = true;
                 break;
             }
         }
         return result;
-
     }
     void HorizontalMovement(Rigidbody rb, Vector3 horizontalforces, Vector3 torque)
     {
@@ -192,5 +184,7 @@ public class GeneralCharacter : MonoBehaviour
     {
         started = true;
     }
+
+
 
 }
