@@ -27,7 +27,7 @@ public class PopulationControlller : MonoBehaviour
                 List<Vector3> allrbHforces = new List<Vector3>();
                 List<float> allrbVforces = new List<float>();
                 List<Vector3> allrbTorque = new List<Vector3>();
-                for (int k =0; k < individual.GetRigidBodies().Count;k++)
+                for (int k = 0; k < individual.GetRigidBodies().Count; k++)
                 {
                     allrbHforces.Add(new Vector3(Random.Range(-1000f, 1000f), Random.Range(-100f, 100f), Random.Range(-1000f, 1000f)));
                     allrbVforces.Add(Random.Range(-1000f, 1000f));
@@ -43,50 +43,34 @@ public class PopulationControlller : MonoBehaviour
             Population.Add(individual);
         }
 
-       
+
         Debug.Log("InitPopulation Done");
     }
     // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         InitPopulation();
         IgnoreRagdollCollisions();
-        StartSimulation();
+    }
+    void Start()
+    {
+
 
     }
 
     // Update is called once per frame  
     void Update()
     {
-        
-    }
-
-    private void StartSimulation()
-    {
-        for (int i =0; i<Population.Count;i++)
-        {
-            Population[i].Act();
-        }
-    }
-
-    private void StopSimulation()
-    {
 
     }
-    private void ResetState()
-    {
-        for (int i = 0; i < PopulationSize; i++)
-        { 
 
-        }
 
-     }
     private void IgnoreCollisionsBetween(List<Collider> allcollidersX, List<Collider> allcollidersY)
     {
         int listsize = allcollidersX.Count;
         for (int i = 0; i < listsize; i++)
         {
-            for(int j = 0; j < listsize; j++)
+            for (int j = 0; j < listsize; j++)
             {
                 Physics.IgnoreCollision(allcollidersX[i], allcollidersY[j]);
             }
@@ -103,5 +87,18 @@ public class PopulationControlller : MonoBehaviour
             }
         }
         Debug.Log("IgnoreRagdollCollisions Done");
+    }
+
+    public List<GeneralCharacter> GetPopulation()
+    {
+        return Population;
+    }
+
+    public void StartMovement()
+    {
+        for (int i = 0; i < Population.Count; i++)
+        {
+            Population[i].Act();
+        }
     }
 }
