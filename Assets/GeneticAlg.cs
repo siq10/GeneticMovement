@@ -8,7 +8,8 @@ public class GeneticAlg : MonoBehaviour
     public EvaluationController EvalComponent;
     public Transform InitialLocation;
     public Transform DesiredLocation;
-
+    public GeneticOperationsController GeneticOperationsComponent;
+    public int NumberOfIterations = 20;
     private void SetRefs()
     {
         EvalComponent.SetPopulation(PopulationComponent.GetPopulation());
@@ -20,13 +21,13 @@ public class GeneticAlg : MonoBehaviour
         InitialLocation = PopulationComponent.InitialLocation;
         DesiredLocation = PopulationComponent.DesiredLocation;
         SetRefs();
-        StartSimulation();
+        StartCoroutine("Coordinate");
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void StartSimulation()
@@ -41,6 +42,21 @@ public class GeneticAlg : MonoBehaviour
     }
     private void ResetState()
     {
+
+    }
+
+    IEnumerator Coordinate()
+    {
+        for (int i = 0; i < NumberOfIterations; i++)
+        {
+            StartSimulation();
+            while (! EvalComponent.done)
+            {
+                yield return new WaitForSeconds(1f);
+            }
+            GeneticOperationsComponent.SelectPopulation(EvalComponent.GetFitnessList());
+            break;
+        }
 
     }
 }

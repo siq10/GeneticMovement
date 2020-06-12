@@ -12,6 +12,9 @@ public class PopulationControlller : MonoBehaviour
     public Transform InitialLocation;
     public Transform DesiredLocation;
 
+    // -- GeneticAlg 
+    public bool done = false;
+    // -- 
     private void InitPopulation()
     {
         for (int i = 0; i < PopulationSize; i++)
