@@ -528,8 +528,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PopulationComponent: {fileID: 1480641280}
   EvalComponent: {fileID: 74866661}
-  InitialLocation: {fileID: 0}
-  DesiredLocation: {fileID: 0}
+  InitialLocation: {fileID: 579207449}
+  DesiredLocation: {fileID: 2074655990}
   GeneticOperationsComponent: {fileID: 1481121792}
   NumberOfIterations: 20
 --- !u!4 &133277204

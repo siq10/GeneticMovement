@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PopulationControlller : MonoBehaviour
 {
@@ -10,7 +12,15 @@ public class PopulationControlller : MonoBehaviour
     public int AppliedStimulusCount = 500;
     private List<GeneralCharacter> Population = new List<GeneralCharacter>();
     public Transform InitialLocation;
-    public Transform DesiredLocation;
+    /*
+     * List of tuples, each tuple belongs to an individual and contains:
+     * 1) All the horizontal motion for the current simmulation - as a List of Lists of Vector3s; 
+     * 2) All the vertical motion for the current simmulation - as a List of Lists of floats;
+     * 3) All the torque motion for the current simmulation - as a List of Lists of Vector3s;
+     * Size - x frames * x rigidbodies * 1 force
+    */
+    private List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> CurrentPopulationDNA = new List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>>();
+
 
     // -- GeneticAlg 
     public bool done = false;
@@ -32,7 +42,7 @@ public class PopulationControlller : MonoBehaviour
                 List<Vector3> allrbTorque = new List<Vector3>();
                 for (int k = 0; k < individual.GetRigidBodies().Count; k++)
                 {
-                    allrbHforces.Add(new Vector3(Random.Range(-1000f, 1000f), Random.Range(-100f, 100f), Random.Range(-1000f, 1000f)));
+                    allrbHforces.Add(new Vector3(UnityEngine.Random.Range(-1000f, 1000f), Random.Range(-100f, 100f), Random.Range(-1000f, 1000f)));
                     allrbVforces.Add(Random.Range(-1000f, 1000f));
                     allrbTorque.Add(new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f)));
                 }
@@ -41,6 +51,10 @@ public class PopulationControlller : MonoBehaviour
                 torque.Add(allrbTorque);
             }
             individual.SetDNA(horizontalForces, verticalForces, torque);
+
+            var tuple = new Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>(horizontalForces,verticalForces,torque);
+            CurrentPopulationDNA.Add(tuple);
+
             individual.SetChromosomeLength(AppliedStimulusCount);
             Debug.Log(individual);
             Population.Add(individual);
@@ -103,5 +117,9 @@ public class PopulationControlller : MonoBehaviour
         {
             Population[i].Act();
         }
+    }
+    public List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> GetPopulationDNA()
+    {
+        return CurrentPopulationDNA;
     }
 }

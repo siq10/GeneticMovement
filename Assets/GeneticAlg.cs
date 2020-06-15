@@ -14,12 +14,12 @@ public class GeneticAlg : MonoBehaviour
     {
         EvalComponent.SetPopulation(PopulationComponent.GetPopulation());
         EvalComponent.SetDestination(DesiredLocation);
+        EvalComponent.SetDistanceFromStartToEnd(Vector3.Distance(InitialLocation.position, DesiredLocation.position));
+        GeneticOperationsComponent.SetPopulationDNA(PopulationComponent.GetPopulationDNA());
     }
     // Start is called before the first frame update
     void Start()
     {
-        InitialLocation = PopulationComponent.InitialLocation;
-        DesiredLocation = PopulationComponent.DesiredLocation;
         SetRefs();
         StartCoroutine("Coordinate");
     }
@@ -54,7 +54,7 @@ public class GeneticAlg : MonoBehaviour
             {
                 yield return new WaitForSeconds(1f);
             }
-            GeneticOperationsComponent.SelectPopulation(EvalComponent.GetFitnessList());
+            GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList());
             break;
         }
 
