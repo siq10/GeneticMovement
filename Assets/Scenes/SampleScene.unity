@@ -1560,7 +1560,6 @@ MonoBehaviour:
   MaxRunTime: 20
   AppliedStimulusCount: 500
   InitialLocation: {fileID: 579207449}
-  DesiredLocation: {fileID: 2074655990}
   done: 0
 --- !u!4 &1480641281
 Transform:
