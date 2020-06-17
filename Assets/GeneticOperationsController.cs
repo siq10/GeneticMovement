@@ -51,6 +51,7 @@ public class GeneticOperationsController : MonoBehaviour
 
         Debug.Log("Fitnesslist has " + FitnessList.Count + " values.");
         CrossOver(0, 1);
+        Mutation(0);
     }
     private void printV(List<List<Vector3>> a, List<List<Vector3>> b)
     {
@@ -71,16 +72,20 @@ public class GeneticOperationsController : MonoBehaviour
     }
     public void CrossOver(int charindex1, int charindex2)
     {
-        List<List<Vector3>> repl1 = new List<List<Vector3>>();
-        List<List<Vector3>> repl2 = new List<List<Vector3>>();
+        List<List<Vector3>> horizontal_result_X = new List<List<Vector3>>();
+        List<List<Vector3>> horizontal_result_Y = new List<List<Vector3>>();
         List<List<Vector3>> horizontal_X = PopulationDNA[charindex1].Item1;
         List<List<Vector3>> horizontal_Y = PopulationDNA[charindex2].Item1;
 
+        List<List<float>> vertical_result_X = new List<List<float>>();
+        List<List<float>> vertical_result_Y = new List<List<float>>();
         List<List<float>> vertical_X = PopulationDNA[charindex1].Item2;
         List<List<float>> vertical_Y = PopulationDNA[charindex2].Item2;
-        
+
+        List<List<Vector3>> torque_result_X = new List<List<Vector3>>();
+        List<List<Vector3>> torque_result_Y = new List<List<Vector3>>();
         List<List<Vector3>> torque_X = PopulationDNA[charindex1].Item3;
-        List<List<Vector3>> torque_Y = PopulationDNA[charindex2].Item3;
+        List<List<Vector3>> torque_Y = PopulationDNA[charindex2].Item3; 
         
         var cutcount = Random.Range(1, PhysicsSteps);
         SortedSet<int> cutindexes = new SortedSet<int>();
@@ -98,13 +103,26 @@ public class GeneticOperationsController : MonoBehaviour
             endI = idx;
             if (swap == false)
             {
-                repl1.AddRange(horizontal_X.GetRange(startI, endI - startI));
-                repl2.AddRange(horizontal_Y.GetRange(startI, endI - startI));
+                horizontal_result_X.AddRange(horizontal_X.GetRange(startI, endI - startI));
+                horizontal_result_Y.AddRange(horizontal_Y.GetRange(startI, endI - startI));
+
+                vertical_result_X.AddRange(vertical_X.GetRange(startI, endI - startI));
+                vertical_result_Y.AddRange(vertical_Y.GetRange(startI, endI - startI));
+                
+                torque_result_X.AddRange(torque_X.GetRange(startI, endI - startI));
+                torque_result_Y.AddRange(torque_Y.GetRange(startI, endI - startI));
             }
             else
             {
-                repl1.AddRange(horizontal_Y.GetRange(startI, endI - startI));
-                repl2.AddRange(horizontal_X.GetRange(startI, endI - startI));
+                horizontal_result_X.AddRange(horizontal_Y.GetRange(startI, endI - startI));
+                horizontal_result_Y.AddRange(horizontal_X.GetRange(startI, endI - startI));
+
+                vertical_result_X.AddRange(vertical_Y.GetRange(startI, endI - startI));
+                vertical_result_Y.AddRange(vertical_X.GetRange(startI, endI - startI));
+
+                torque_result_X.AddRange(torque_Y.GetRange(startI, endI - startI));
+                torque_result_Y.AddRange(torque_X.GetRange(startI, endI - startI));
+
             }
             startI = endI;
             swap = !swap;
@@ -112,21 +130,60 @@ public class GeneticOperationsController : MonoBehaviour
         endI = PhysicsSteps;
         if (swap == false)
         {
-            repl1.AddRange(horizontal_X.GetRange(startI, endI - startI));
-            repl2.AddRange(horizontal_Y.GetRange(startI, endI - startI));
+            horizontal_result_X.AddRange(horizontal_X.GetRange(startI, endI - startI));
+            horizontal_result_Y.AddRange(horizontal_Y.GetRange(startI, endI - startI));
+
+            vertical_result_X.AddRange(vertical_X.GetRange(startI, endI - startI));
+            vertical_result_Y.AddRange(vertical_Y.GetRange(startI, endI - startI));
+
+            torque_result_X.AddRange(torque_X.GetRange(startI, endI - startI));
+            torque_result_Y.AddRange(torque_Y.GetRange(startI, endI - startI));
         }
         else
         {
-            repl1.AddRange(horizontal_Y.GetRange(startI, endI - startI));
-            repl2.AddRange(horizontal_X.GetRange(startI, endI - startI));
-        }
-        // last index to the list end.
+            horizontal_result_X.AddRange(horizontal_Y.GetRange(startI, endI - startI));
+            horizontal_result_Y.AddRange(horizontal_X.GetRange(startI, endI - startI));
 
+            vertical_result_X.AddRange(vertical_Y.GetRange(startI, endI - startI));
+            vertical_result_Y.AddRange(vertical_X.GetRange(startI, endI - startI));
+
+            torque_result_X.AddRange(torque_Y.GetRange(startI, endI - startI));
+            torque_result_Y.AddRange(torque_X.GetRange(startI, endI - startI));
+
+        }
+        // last index from list  ----->  last physicstep (last frame).
+ 
         //printV(repl1, horizontal_X);
 
+        Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>> replacement_X = 
+            new Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>(horizontal_result_X,vertical_result_X,torque_result_X); 
 
+        Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>> replacement_Y = 
+            new Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>(horizontal_result_Y,vertical_result_Y,torque_result_Y);
 
-        //Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>> replacement = new Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>(); 
+        PopulationDNA[charindex1] = replacement_X;
+        PopulationDNA[charindex2] = replacement_Y;
     }
 
+    public void Mutation(int charindex)
+    {
+        int affected_step = Random.Range(0, PhysicsSteps);
+        var horizontal_list = PopulationDNA[charindex].Item1[affected_step];
+        var vertical_list = PopulationDNA[charindex].Item2[affected_step];
+        var torque_list = PopulationDNA[charindex].Item3[affected_step];
+
+        List<Vector3> allrbHforces = new List<Vector3>();
+        List<float> allrbVforces = new List<float>();
+        List<Vector3> allrbTorque = new List<Vector3>();
+        var len = horizontal_list.Count;
+        for (int i=0; i< len;i++)
+        {
+            allrbHforces.Add(new Vector3(UnityEngine.Random.Range(-1000f, 1000f), Random.Range(-100f, 100f), Random.Range(-1000f, 1000f)));
+            allrbVforces.Add(Random.Range(-1000f, 1000f));
+            allrbTorque.Add(new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f)));
+        }
+        horizontal_list = allrbHforces;
+        vertical_list = allrbVforces;
+        torque_list = allrbTorque;
+    }
 }
