@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
@@ -9,7 +10,7 @@ using Random = UnityEngine.Random;
 
 public enum SelectionMethod
 {
-    LuckWheel,
+    RouletteWheel,
     Rank,
     Tournament
 }
@@ -17,7 +18,7 @@ public class GeneticOperationsController : MonoBehaviour
 {
     // Start is called before the first frame update
     public bool done;
-    public SelectionMethod SelectMethod = SelectionMethod.LuckWheel;
+    public SelectionMethod SelectMethod = SelectionMethod.RouletteWheel;
     public bool Elitism = true;
     public float MutationRate = 0.02f;
 
@@ -36,9 +37,39 @@ public class GeneticOperationsController : MonoBehaviour
         
     }
 
-    public void SelectFittest(List<float> FitnessList)
+    public List<int> Select(List<float> FitnessList)
     {
         Debug.Log("Fitnesslist has " + FitnessList.Count + " values.");
+        List<int> indexes = new List<int>();
+        switch(SelectMethod)
+        {
+            case SelectionMethod.RouletteWheel:
+                float fitness_sum = FitnessList.Sum();
+                int popsize = FitnessList.Count;
+                List<float> selection_probabilities = new List<float>(popsize);
+                foreach (var fitness in FitnessList)
+                {
+                    selection_probabilities.Add(fitness/fitness_sum);
+                }
+                List<float> selection_probabilities_cumulated = new List<float>(new float[popsize+1]);
+                //roulette
+                selection_probabilities_cumulated[0] = 0f;
+                for (var j = 0; j < popsize; j++)
+                {
+                    selection_probabilities_cumulated[j+1] = selection_probabilities_cumulated[j] + selection_probabilities[j];
+                }
+                for (var i = 0; i < popsize; i++)
+                {
+                    var rand = Random.Range(0.0000001f, 1);
+                    //tbc
+                }
+                break;
+            case SelectionMethod.Rank:
+                break;
+            case SelectionMethod.Tournament:
+                break;
+        }
+        return indexes;
     }
     public void SetPopulationDNA(List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> dna)
     {
@@ -48,7 +79,7 @@ public class GeneticOperationsController : MonoBehaviour
     {
         PhysicsSteps = PopulationDNA[0].Item1.Count;
         RigidBodiesPerIndividual = PopulationDNA[0].Item1[0].Count;
-
+        Select(FitnessList);
         Debug.Log("Fitnesslist has " + FitnessList.Count + " values.");
         CrossOver(0, 1);
         Mutation(0);
