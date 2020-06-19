@@ -61,7 +61,7 @@ public class GeneticOperationsController : MonoBehaviour
                 for (var i = 0; i < popsize; i++)
                 {
                     var rand = Random.Range(0.0000001f, 1);
-                    //tbc
+                    indexes.Add(BinarySearch(selection_probabilities_cumulated, rand));
                 }
                 break;
             case SelectionMethod.Rank:
@@ -79,8 +79,9 @@ public class GeneticOperationsController : MonoBehaviour
     {
         PhysicsSteps = PopulationDNA[0].Item1.Count;
         RigidBodiesPerIndividual = PopulationDNA[0].Item1[0].Count;
-        Select(FitnessList);
+        List<int> survivors = Select(FitnessList);
         Debug.Log("Fitnesslist has " + FitnessList.Count + " values.");
+        
         CrossOver(0, 1);
         Mutation(0);
     }
@@ -216,5 +217,27 @@ public class GeneticOperationsController : MonoBehaviour
         horizontal_list = allrbHforces;
         vertical_list = allrbVforces;
         torque_list = allrbTorque;
+    }
+
+    private int BinarySearch(List<float> a, float item)
+    {
+        int start_index = 0;
+        int end_index = a.Count - 1;
+        int result_index = 0;
+        while (start_index <= end_index)
+        {
+            result_index = start_index + (end_index - start_index) / 2;
+            if (item > a[result_index])
+                start_index = result_index + 1;
+            else
+                end_index = result_index - 1;
+            if (a[result_index] == item)
+            {
+                return result_index - 1;
+                //return the index before the found number.
+            }
+        }
+        return a[result_index] < item ? result_index : result_index - 1;
+        //return the index closest to the number, on the left side.
     }
 }
