@@ -70,12 +70,21 @@ public class EvaluationController : MonoBehaviour
 
 
         Debug.Log("Smith no " + bestsmithindex + " is the best");
-        var outline = PopulationReference[bestsmithindex].gameObject.AddComponent<Outline>();
 
-        outline.OutlineMode = Outline.Mode.OutlineAll;
-        outline.OutlineColor = Color.red;
-        outline.OutlineWidth = 5f;
+        if(PopulationReference[0].GetComponent<Outline>() == null)
+        {
+            var outline1 = PopulationReference[0].gameObject.AddComponent<Outline>();
 
+            outline1.OutlineMode = Outline.Mode.OutlineAll;
+            outline1.OutlineColor = Color.green;
+            outline1.OutlineWidth = 5f;
+
+            var outline2 = PopulationReference[1].gameObject.AddComponent<Outline>();
+
+            outline2.OutlineMode = Outline.Mode.OutlineAll;
+            outline2.OutlineColor = Color.blue;
+            outline2.OutlineWidth = 5f;
+        }
         NotifyFinish();
         //PopulationReference[bestsmithindex].gameObject.GetComponent<Renderer>().material.color = Color.red;
     }
@@ -88,6 +97,11 @@ public class EvaluationController : MonoBehaviour
     private void NotifyFinish()
     {
         done = true;
+    }
+
+    public void ResetState()
+    {
+        done = false;
     }
 
     private float GetNormalizedValue(float value, float minValue, float maxValue)

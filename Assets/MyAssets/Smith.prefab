@@ -559,7 +559,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2784716949808296471}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 9000000, guid: 6996385895b383749b266464bf872c69, type: 3}
   m_Controller: {fileID: 0}
   m_CullingMode: 1
@@ -598,6 +598,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a51ead0bfec3fe4ab9ce6cd38f613b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stage: 0
   TerrainList:
   - Platform
   started: 0

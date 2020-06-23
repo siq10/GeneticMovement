@@ -59,8 +59,6 @@ public class PopulationControlller : MonoBehaviour
             Debug.Log(individual);
             Population.Add(individual);
         }
-
-
         Debug.Log("InitPopulation Done");
     }
     // Start is called before the first frame update
@@ -71,7 +69,7 @@ public class PopulationControlller : MonoBehaviour
     }
     void Start()
     {
-
+        //Time.timeScale = 2f;
 
     }
 
@@ -80,7 +78,21 @@ public class PopulationControlller : MonoBehaviour
     {
 
     }
-
+    public void ResetState()
+    {
+        foreach(var candidate in Population)
+        {
+            var rbs = candidate.GetRigidBodies();
+            int rbcount = rbs.Count; 
+            rbs[0].transform.position = InitialLocation.position;
+            for (int i = 0; i < rbcount; i++)
+            {
+                rbs[i].velocity = Vector3.zero;
+                rbs[i].angularVelocity = Vector3.zero;
+            }
+            candidate.stage = 0;
+        }
+    }
 
     private void IgnoreCollisionsBetween(List<Collider> allcollidersX, List<Collider> allcollidersY)
     {

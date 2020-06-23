@@ -13,7 +13,7 @@ public class GeneralCharacter : MonoBehaviour
     private List<List<Vector3>> torqueDNA = new List<List<Vector3>>();
     private List<List<float>> VerticalMovementDNA = new List<List<float>>();
     private List<Rigidbody> allrigidbodies = new List<Rigidbody>();
-    private int stage = 0;
+    public int stage = 0;
     private int ChromosomeLength = 500;
 
     private bool grounded = true;
@@ -182,6 +182,7 @@ public class GeneralCharacter : MonoBehaviour
     }
     public void Act()
     {
+        finished = false;
         started = true;
     }
 

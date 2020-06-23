@@ -42,7 +42,8 @@ public class GeneticAlg : MonoBehaviour
     }
     private void ResetState()
     {
-
+        PopulationComponent.ResetState();
+        EvalComponent.ResetState();
     }
 
     IEnumerator Coordinate()
@@ -55,7 +56,8 @@ public class GeneticAlg : MonoBehaviour
                 yield return new WaitForSeconds(1f);
             }
             GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList());
-            break;
+            ResetState();
+            //break;
         }
 
     }

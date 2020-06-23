@@ -20,6 +20,7 @@ public class GeneticOperationsController : MonoBehaviour
     public bool done;
     public SelectionMethod SelectMethod = SelectionMethod.RouletteWheel;
     public bool Elitism = true;
+    public int EliteCount = 2;
     public float MutationRate = 0.02f;
 
     private int PhysicsSteps = 500;
@@ -81,10 +82,56 @@ public class GeneticOperationsController : MonoBehaviour
         RigidBodiesPerIndividual = PopulationDNA[0].Item1[0].Count;
         List<int> survivors = Select(FitnessList);
         Debug.Log("Fitnesslist has " + FitnessList.Count + " values.");
+        List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> NewDNA = new List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>>();
+
+        var halfpopsize = FitnessList.Count / 2;
+        for(int i= 0; i< halfpopsize;i++)
+        {
+            var parent1index = Random.Range(0, survivors.Count);
+            var parent2index = Random.Range(0, survivors.Count);
+            NewDNA.AddRange(CrossOver(parent1index, parent2index));
+        }
+        for(int j = 0; j< NewDNA.Count;j++)
+        {
+            Mutation(j, NewDNA);
+        }
         
-        CrossOver(0, 1);
-        Mutation(0);
+        // Elitism - preserving the best 2 individuals from the current generation.
+        if(Elitism == true)
+        {
+            int[] bestindexes = GetBestX(FitnessList);
+            for (int i = 0; i < bestindexes.Length; i++)
+            {
+                NewDNA[i] = PopulationDNA[bestindexes[i]];
+            }
+        }
+        PopulationDNA = NewDNA;
     }
+    private int[] GetBestX(List<float> FitnessList)
+    {
+        int[] result = new int[EliteCount];
+        float[] maxvalues = new float[EliteCount];
+        var maxlen = maxvalues.Length;
+        for (int i =0; i< FitnessList.Count; i++)
+        {
+            for(int j = 0; j < maxlen; j++)
+            {
+                if(FitnessList[i] > maxvalues[j])
+                {
+                    for(int k = maxlen - 2; k >= j; k--)
+                    {
+                        maxvalues[k+1] = maxvalues[k];
+                        result[k + 1] = result[k];
+                    }
+                    maxvalues[j] = FitnessList[i];
+                    result[j] = i;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     private void printV(List<List<Vector3>> a, List<List<Vector3>> b)
     {
         for(var i =0; i < a.Count; i++)
@@ -102,7 +149,7 @@ public class GeneticOperationsController : MonoBehaviour
             Debug.Log(txtb);
         }
     }
-    public void CrossOver(int charindex1, int charindex2)
+    public List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> CrossOver(int charindex1, int charindex2)
     {
         List<List<Vector3>> horizontal_result_X = new List<List<Vector3>>();
         List<List<Vector3>> horizontal_result_Y = new List<List<Vector3>>();
@@ -193,30 +240,30 @@ public class GeneticOperationsController : MonoBehaviour
         Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>> replacement_Y = 
             new Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>(horizontal_result_Y,vertical_result_Y,torque_result_Y);
 
-        PopulationDNA[charindex1] = replacement_X;
-        PopulationDNA[charindex2] = replacement_Y;
+        List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> result = new List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>>();
+        result.Add(replacement_X);
+        result.Add(replacement_Y);
+        return result;
     }
 
-    public void Mutation(int charindex)
+    public void Mutation(int charindex, List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> NewDNA)
     {
-        int affected_step = Random.Range(0, PhysicsSteps);
-        var horizontal_list = PopulationDNA[charindex].Item1[affected_step];
-        var vertical_list = PopulationDNA[charindex].Item2[affected_step];
-        var torque_list = PopulationDNA[charindex].Item3[affected_step];
-
-        List<Vector3> allrbHforces = new List<Vector3>();
-        List<float> allrbVforces = new List<float>();
-        List<Vector3> allrbTorque = new List<Vector3>();
-        var len = horizontal_list.Count;
-        for (int i=0; i< len;i++)
+        for (int affected_step = 0; affected_step < PhysicsSteps; affected_step++)
         {
-            allrbHforces.Add(new Vector3(UnityEngine.Random.Range(-1000f, 1000f), Random.Range(-100f, 100f), Random.Range(-1000f, 1000f)));
-            allrbVforces.Add(Random.Range(-1000f, 1000f));
-            allrbTorque.Add(new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f)));
+            var horizontal_list = NewDNA[charindex].Item1[affected_step];
+            var vertical_list = NewDNA[charindex].Item2[affected_step];
+            var torque_list = NewDNA[charindex].Item3[affected_step]; 
+            var len = horizontal_list.Count;
+            for (int i = 0; i < len; i++)
+            {
+                if (Random.Range(0f, 1f) < MutationRate)
+                {
+                    horizontal_list[i] = (new Vector3(UnityEngine.Random.Range(-1000f, 1000f), Random.Range(-100f, 100f), Random.Range(-1000f, 1000f)));
+                    vertical_list[i] = (Random.Range(-1000f, 1000f));
+                    torque_list[i] = (new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f)));
+                }
+            }
         }
-        horizontal_list = allrbHforces;
-        vertical_list = allrbVforces;
-        torque_list = allrbTorque;
     }
 
     private int BinarySearch(List<float> a, float item)
