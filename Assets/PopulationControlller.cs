@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 using Random = UnityEngine.Random;
 
 public class PopulationControlller : MonoBehaviour
@@ -12,6 +13,11 @@ public class PopulationControlller : MonoBehaviour
     public int AppliedStimulusCount = 500;
     private List<GeneralCharacter> Population = new List<GeneralCharacter>();
     public Transform InitialLocation;
+    public List<Vector3> Positions;
+    public List<Quaternion> Rotations;
+    private GameObject origin = null;
+
+
     /*
      * List of tuples, each tuple belongs to an individual and contains:
      * 1) All the horizontal motion for the current simmulation - as a List of Lists of Vector3s; 
@@ -27,11 +33,12 @@ public class PopulationControlller : MonoBehaviour
     // -- 
     private void InitPopulation()
     {
+        origin = Instantiate(CharacterType, InitialLocation.position, Quaternion.identity);
+        origin.SetActive(false);
         for (int i = 0; i < PopulationSize; i++)
         {
-            GameObject obj = Instantiate(CharacterType, InitialLocation.position, Quaternion.identity);
-            obj.transform.SetParent(transform);
-            GeneralCharacter individual = obj.GetComponent<GeneralCharacter>();
+            GeneralCharacter individual = origin.GetComponent<GeneralCharacter>();
+
             List<List<Vector3>> horizontalForces = new List<List<Vector3>>();
             List<List<float>> verticalForces = new List<List<float>>();
             List<List<Vector3>> torque = new List<List<Vector3>>();
@@ -40,36 +47,53 @@ public class PopulationControlller : MonoBehaviour
                 List<Vector3> allrbHforces = new List<Vector3>();
                 List<float> allrbVforces = new List<float>();
                 List<Vector3> allrbTorque = new List<Vector3>();
-                for (int k = 0; k < individual.GetRigidBodies().Count; k++)
+                for (int k = 0; k < 17; k++)
                 {
-                    allrbHforces.Add(new Vector3(UnityEngine.Random.Range(-1000f, 1000f), Random.Range(-100f, 100f), Random.Range(-1000f, 1000f)));
-                    allrbVforces.Add(Random.Range(-1000f, 1000f));
-                    allrbTorque.Add(new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f)));
+                    allrbHforces.Add(new Vector3(UnityEngine.Random.Range(-1000f, 1000f),
+                        UnityEngine.Random.Range(-100f, 100f),
+                        UnityEngine.Random.Range(-1000f, 1000f)));
+                    allrbVforces.Add(UnityEngine.Random.Range(-1000f, 1000f));
+                    allrbTorque.Add(new Vector3(
+                        UnityEngine.Random.Range(-10f, 10f),
+                        UnityEngine.Random.Range(-10f, 10f),
+                        UnityEngine.Random.Range(-10f, 10f)));
                 }
                 horizontalForces.Add(allrbHforces);
                 verticalForces.Add(allrbVforces);
                 torque.Add(allrbTorque);
             }
-            individual.SetDNA(horizontalForces, verticalForces, torque);
+            GameObject obj = CreateAndPrepare(horizontalForces, verticalForces, torque);
+            obj.transform.SetParent(transform);
 
             var tuple = new Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>(horizontalForces,verticalForces,torque);
             CurrentPopulationDNA.Add(tuple);
-
-            individual.SetChromosomeLength(AppliedStimulusCount);
-            Debug.Log(individual);
-            Population.Add(individual);
+            Population.Add(obj.GetComponent<GeneralCharacter>());
         }
         Debug.Log("InitPopulation Done");
+    }
+
+    private GameObject CreateAndPrepare(List<List<Vector3>> h, List<List<float>> v, List<List<Vector3>> t)
+    {
+        GameObject obj = Instantiate(origin);
+        obj.transform.SetParent(transform);
+        GeneralCharacter individual = obj.GetComponent<GeneralCharacter>();
+        individual.SetDNA(h, v, t);
+        individual.SetChromosomeLength(AppliedStimulusCount);
+        individual.stage = 0;
+        return obj;
     }
     // Start is called before the first frame update
     private void Awake()
     {
+        Random.seed = 42;
+
         InitPopulation();
         IgnoreRagdollCollisions();
+
     }
     void Start()
     {
-        //Time.timeScale = 2f;
+        Time.timeScale = 25f;
 
     }
 
@@ -80,18 +104,56 @@ public class PopulationControlller : MonoBehaviour
     }
     public void ResetState()
     {
-        foreach(var candidate in Population)
+        Debug.Break();
+       /* for (int i = 0; i < Population.Count; i++)
         {
-            var rbs = candidate.GetRigidBodies();
-            int rbcount = rbs.Count; 
-            rbs[0].transform.position = InitialLocation.position;
-            for (int i = 0; i < rbcount; i++)
-            {
-                rbs[i].velocity = Vector3.zero;
-                rbs[i].angularVelocity = Vector3.zero;
-            }
-            candidate.stage = 0;
+            Destroy(Population[i].gameObject);
+            Population[i] = CreateAndPrepare(CurrentPopulationDNA[i].Item1, CurrentPopulationDNA[i].Item2, CurrentPopulationDNA[i].Item3).GetComponent<GeneralCharacter>();
         }
+        IgnoreRagdollCollisions();
+       /* foreach (var candidate in Population)
+        {
+            var i = 0;
+            var x = candidate.transform.GetComponentsInChildren<Transform>(true);
+            foreach (Transform child in x)
+            {
+                var rb = child.GetComponent<Rigidbody>();
+                if (rb)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
+                child.position = Positions[i];
+                child.rotation = Rotations[i];
+                i++;
+            }
+        }
+
+        /* var rbs = candidate.GetRigidBodies();
+         int rbcount = rbs.Count; 
+         rbs[0].transform.position = InitialLocation.position;
+         for (int i = 0; i < rbcount; i++)
+         {   
+             rbs[i].velocity = Vector3.zero;
+             rbs[i].angularVelocity = Vector3.zero;
+             rbs[i].position = Positions[i];
+             rbs[i].rotation = Rotations[i];
+         }*/
+        /* candidate.stage = 0;
+     }
+     foreach (var candidate in Population)
+     {
+         var x = candidate.transform.GetComponentsInChildren<Transform>(true);
+         foreach (Transform child in x)
+         {
+             var rb = child.GetComponent<Rigidbody>();
+             if (rb)
+             {
+                // rb.isKinematic = false;
+                 //rb.useGravity = true;
+             }
+         }
+     }*/
     }
 
     private void IgnoreCollisionsBetween(List<Collider> allcollidersX, List<Collider> allcollidersY)
@@ -107,7 +169,7 @@ public class PopulationControlller : MonoBehaviour
     }
     private void IgnoreRagdollCollisions()
     {
-        for (int i = 0; i < PopulationSize - 1; i++)
+        /*for (int i = 0; i < PopulationSize - 1; i++)
         {
             List<Collider> collidersforI = Population[i].GetAllColliders();
             for (int j = i + 1; j < PopulationSize; j++)
@@ -115,7 +177,17 @@ public class PopulationControlller : MonoBehaviour
                 IgnoreCollisionsBetween(collidersforI, Population[j].GetAllColliders());
             }
         }
-        Debug.Log("IgnoreRagdollCollisions Done");
+        */
+
+        for (int i = 0; i < PopulationSize; i++)
+        {
+            List<Collider> collidersforI = Population[i].GetAllColliders();
+            for (int j = 0; j < collidersforI.Count-1; j++)
+            {
+                for (int k = j + 1; k < collidersforI.Count; k++)
+                    Physics.IgnoreCollision(collidersforI[j], collidersforI[k],false);
+            }
+        }
     }
 
     public List<GeneralCharacter> GetPopulation()
@@ -127,6 +199,7 @@ public class PopulationControlller : MonoBehaviour
     {
         for (int i = 0; i < Population.Count; i++)
         {
+            Population[i].gameObject.SetActive(true);
             Population[i].Act();
         }
     }

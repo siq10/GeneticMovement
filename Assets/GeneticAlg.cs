@@ -55,7 +55,7 @@ public class GeneticAlg : MonoBehaviour
             {
                 yield return new WaitForSeconds(1f);
             }
-            GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList());
+            //GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList());
             ResetState();
             //break;
         }

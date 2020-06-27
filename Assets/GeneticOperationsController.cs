@@ -78,7 +78,7 @@ public class GeneticOperationsController : MonoBehaviour
     }
     public void ComputeNextGeneration(List<float> FitnessList)
     {
-        PhysicsSteps = PopulationDNA[0].Item1.Count;
+        /*PhysicsSteps = PopulationDNA[0].Item1.Count;
         RigidBodiesPerIndividual = PopulationDNA[0].Item1[0].Count;
         List<int> survivors = Select(FitnessList);
         Debug.Log("Fitnesslist has " + FitnessList.Count + " values.");
@@ -105,7 +105,8 @@ public class GeneticOperationsController : MonoBehaviour
                 NewDNA[i] = PopulationDNA[bestindexes[i]];
             }
         }
-        PopulationDNA = NewDNA;
+        PopulationDNA = NewDNA;*/
+       // printV(PopulationDNA[0].Item1, PopulationDNA[1].Item1);
     }
     private int[] GetBestX(List<float> FitnessList)
     {

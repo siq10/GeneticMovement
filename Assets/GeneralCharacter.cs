@@ -43,16 +43,17 @@ public class GeneralCharacter : MonoBehaviour
 
     void Start()
     {
-
-        for (int i = 0; i < GetChildren().Length; i++)
+        bool foundhead = false;
+        var children = GetChildren();
+        for (int i = 0; i < children.Length; i++)
         {
-            if (allchildren[i].CompareTag("CHead"))
+            if (!foundhead && allchildren[i].CompareTag("CHead"))
             {
+                foundhead = true;
                 headrb = allchildren[i].GetComponent<Rigidbody>();
                 Debug.Log(allchildren[i].name);
-
             }
-            if (allchildren[i].gameObject.layer == 10)
+            if (allchildren[i].CompareTag("limb"))
             {
                 limbs.Add(allchildren[i].gameObject);
             }
@@ -145,13 +146,13 @@ public class GeneralCharacter : MonoBehaviour
     void HorizontalMovement(Rigidbody rb, Vector3 horizontalforces, Vector3 torque)
     {
         rb.AddTorque(torque);
-        rb.AddForce(Vector3.Scale(new Vector3(1, 1, 1), horizontalforces), ForceMode.Force);
+        rb.AddForce(Vector3.Scale(new Vector3(1 * Time.fixedDeltaTime, 1*Time.fixedDeltaTime, 1 * Time.fixedDeltaTime), horizontalforces), ForceMode.Impulse);
     }
     void VerticalMovement(Rigidbody rb, float verticalforce)
     {
         if(IsGrounded())
         {
-            rb.AddForce(new Vector3(0, 1, 0) * verticalforce);
+            rb.AddForce(new Vector3(0, 1*Time.fixedDeltaTime, 0) * verticalforce,ForceMode.Impulse);
         }
     }
     float GetHeadYcoordinate()
