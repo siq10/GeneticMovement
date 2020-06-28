@@ -63,6 +63,7 @@ public class PopulationControlller : MonoBehaviour
                 torque.Add(allrbTorque);
             }
             GameObject obj = CreateAndPrepare(horizontalForces, verticalForces, torque);
+            obj.name = "Smith" + i;
             obj.transform.SetParent(transform);
 
             var tuple = new Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>(horizontalForces,verticalForces,torque);
@@ -76,6 +77,7 @@ public class PopulationControlller : MonoBehaviour
     {
         GameObject obj = Instantiate(origin);
         obj.transform.SetParent(transform);
+        obj.name = "Smith";
         GeneralCharacter individual = obj.GetComponent<GeneralCharacter>();
         individual.SetDNA(h, v, t);
         individual.SetChromosomeLength(AppliedStimulusCount);
@@ -85,7 +87,7 @@ public class PopulationControlller : MonoBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
-        Random.seed = 42;
+        Random.seed = 42;   
 
         InitPopulation();
         IgnoreRagdollCollisions();
@@ -93,7 +95,7 @@ public class PopulationControlller : MonoBehaviour
     }
     void Start()
     {
-        Time.timeScale = 25f;
+       // Time.timeScale = 16f;
 
     }
 
@@ -105,10 +107,16 @@ public class PopulationControlller : MonoBehaviour
     public void ResetState()
     {
         Debug.Break();
-       /* for (int i = 0; i < Population.Count; i++)
+        Destroy(origin);
+        origin = null;
+        origin = Instantiate(CharacterType, InitialLocation.position, Quaternion.identity);
+        origin.SetActive(false);
+        for (int i = 0; i < Population.Count; i++)
         {
             Destroy(Population[i].gameObject);
+            Population[i] = null;
             Population[i] = CreateAndPrepare(CurrentPopulationDNA[i].Item1, CurrentPopulationDNA[i].Item2, CurrentPopulationDNA[i].Item3).GetComponent<GeneralCharacter>();
+            Population[i].name = "Smith" + i;
         }
         IgnoreRagdollCollisions();
        /* foreach (var candidate in Population)

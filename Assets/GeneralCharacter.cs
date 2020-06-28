@@ -73,6 +73,9 @@ public class GeneralCharacter : MonoBehaviour
         {
             for(int i =0; i< GetRigidBodies().Count;i++)
             {
+                Debug.Log(name + " " + allrigidbodies[i].name + " " + "Velocity = " + allrigidbodies[i].velocity);
+                Debug.Log(name + " " + allrigidbodies[i].name + " " + "Ang Velocity = " + allrigidbodies[i].angularVelocity);
+
                 HorizontalMovement(allrigidbodies[i], HorizontalMovementDNA[stage][i], torqueDNA[stage][i]);
                 VerticalMovement(allrigidbodies[i], VerticalMovementDNA[stage][i]);
             }
@@ -145,7 +148,7 @@ public class GeneralCharacter : MonoBehaviour
     }
     void HorizontalMovement(Rigidbody rb, Vector3 horizontalforces, Vector3 torque)
     {
-        rb.AddTorque(torque);
+        rb.AddTorque(torque*Time.fixedDeltaTime,ForceMode.Impulse);
         rb.AddForce(Vector3.Scale(new Vector3(1 * Time.fixedDeltaTime, 1*Time.fixedDeltaTime, 1 * Time.fixedDeltaTime), horizontalforces), ForceMode.Impulse);
     }
     void VerticalMovement(Rigidbody rb, float verticalforce)
