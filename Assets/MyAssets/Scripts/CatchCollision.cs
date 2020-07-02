@@ -9,7 +9,7 @@ public class CatchCollision : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("p"))
         {
-            Debug.Log(name + " collided with terrain");
+            //Debug.Log(name + " collided with terrain");
             grounded = true;
         }
     }
@@ -18,7 +18,7 @@ public class CatchCollision : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("p"))
         {
-            Debug.Log(name + " no longer in contact with terrain");
+            //Debug.Log(name + " no longer in contact with terrain");
             grounded = false;
         }
 

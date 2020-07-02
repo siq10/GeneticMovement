@@ -1556,7 +1556,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CharacterType: {fileID: 2784716949808296471, guid: aea450a8890ca5e468355c76b1d2509e,
     type: 3}
-  PopulationSize: 2
+  PopulationSize: 50
   MaxRunTime: 20
   AppliedStimulusCount: 500
   InitialLocation: {fileID: 579207449}
@@ -1610,7 +1610,7 @@ MonoBehaviour:
   SelectMethod: 0
   Elitism: 1
   EliteCount: 2
-  MutationRate: 0.02
+  MutationRate: 0.00001
 --- !u!4 &1481121793
 Transform:
   m_ObjectHideFlags: 0

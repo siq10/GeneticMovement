@@ -71,20 +71,7 @@ public class EvaluationController : MonoBehaviour
 
         Debug.Log("Smith no " + bestsmithindex + " is the best");
 
-        if(PopulationReference[0].GetComponent<Outline>() == null)
-        {
-            var outline1 = PopulationReference[0].gameObject.AddComponent<Outline>();
 
-            outline1.OutlineMode = Outline.Mode.OutlineAll;
-            outline1.OutlineColor = Color.green;
-            outline1.OutlineWidth = 5f;
-
-            var outline2 = PopulationReference[1].gameObject.AddComponent<Outline>();
-
-            outline2.OutlineMode = Outline.Mode.OutlineAll;
-            outline2.OutlineColor = Color.blue;
-            outline2.OutlineWidth = 5f;
-        }
         NotifyFinish();
         //PopulationReference[bestsmithindex].gameObject.GetComponent<Renderer>().material.color = Color.red;
     }

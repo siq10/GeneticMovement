@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using UnityEngine;
 
 public class GeneticAlg : MonoBehaviour
 {
+    private static int simcounter = 0;
     public PopulationControlller PopulationComponent;
     public EvaluationController EvalComponent;
     public Transform InitialLocation;
@@ -22,6 +25,7 @@ public class GeneticAlg : MonoBehaviour
     {
         SetRefs();
         StartCoroutine("Coordinate");
+
     }
 
     // Update is called once per frame
@@ -48,16 +52,19 @@ public class GeneticAlg : MonoBehaviour
 
     IEnumerator Coordinate()
     {
-        for (int i = 0; i < NumberOfIterations; i++)
-        {
+        while(simcounter < NumberOfIterations)
+        { 
+            GeneticOperationsComponent.SetPopulationDNA(PopulationComponent.GetPopulationDNA());
+            List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> DnaFromNextGen = new List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>>();
             StartSimulation();
             while (! EvalComponent.done)
             {
                 yield return new WaitForSeconds(1f);
             }
-            //GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList());
+            GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList(),out DnaFromNextGen);
+            PopulationComponent.SetDNA(DnaFromNextGen);
             ResetState();
-            //break;
+            simcounter++;
         }
 
     }

@@ -58,7 +58,7 @@ public class GeneralCharacter : MonoBehaviour
                 limbs.Add(allchildren[i].gameObject);
             }
         }
-        Debug.Log("Limbs layer count: " + limbs.Count);
+        //Debug.Log("Limbs layer count: " + limbs.Count);
 
     }
 
@@ -73,8 +73,8 @@ public class GeneralCharacter : MonoBehaviour
         {
             for(int i =0; i< GetRigidBodies().Count;i++)
             {
-                Debug.Log(name + " " + allrigidbodies[i].name + " " + "Velocity = " + allrigidbodies[i].velocity);
-                Debug.Log(name + " " + allrigidbodies[i].name + " " + "Ang Velocity = " + allrigidbodies[i].angularVelocity);
+                //Debug.Log(name + " " + allrigidbodies[i].name + " " + "Velocity = " + allrigidbodies[i].velocity);
+                //Debug.Log(name + " " + allrigidbodies[i].name + " " + "Ang Velocity = " + allrigidbodies[i].angularVelocity);
 
                 HorizontalMovement(allrigidbodies[i], HorizontalMovementDNA[stage][i], torqueDNA[stage][i]);
                 VerticalMovement(allrigidbodies[i], VerticalMovementDNA[stage][i]);
