@@ -52,11 +52,12 @@ public class GeneticAlg : MonoBehaviour
 
     IEnumerator Coordinate()
     {
-        while(simcounter < NumberOfIterations)
-        { 
+        while (simcounter < NumberOfIterations)
+        {
             GeneticOperationsComponent.SetPopulationDNA(PopulationComponent.GetPopulationDNA());
             List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> DnaFromNextGen = new List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>>();
             StartSimulation();
+            EvalComponent.SetHeadPositionY(PopulationComponent.GetHeadPositionY());
             while (! EvalComponent.done)
             {
                 yield return new WaitForSeconds(1f);

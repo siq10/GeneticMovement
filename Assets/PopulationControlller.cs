@@ -154,7 +154,6 @@ public class PopulationControlller : MonoBehaviour
     private void Awake()
     {
         //Random.seed = 42;   
-
         InitPopulation();
         IgnoreRagdollCollisions();
 
@@ -162,7 +161,7 @@ public class PopulationControlller : MonoBehaviour
     }
     void Start()
     {
-        Time.timeScale = 4f;
+        Time.timeScale = 2f;
         var outline1 = Population[0].gameObject.AddComponent<Outline>();
 
         outline1.OutlineMode = Outline.Mode.OutlineAll;
@@ -277,6 +276,10 @@ public class PopulationControlller : MonoBehaviour
         }
     }
 
+    public float GetHeadPositionY()
+    {
+        return Population[0].GetHeadY();
+    }
     public List<GeneralCharacter> GetPopulation()
     {
         return Population;

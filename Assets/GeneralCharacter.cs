@@ -28,7 +28,7 @@ public class GeneralCharacter : MonoBehaviour
     Transform[] allchildren = { };
     private List<Collider> allcolliders = new List<Collider>();
     float distToGround;
-    List<GameObject> limbs = new List<GameObject>();
+    List<CatchCollision> limbs = new List<CatchCollision>();
 
     public void SetDNA(List<List<Vector3>> horizontalMovement, List<List<float>> verticalMovement, List<List<Vector3>> torque)
     {
@@ -43,6 +43,10 @@ public class GeneralCharacter : MonoBehaviour
 
     void Start()
     {
+
+    }
+    private void Awake()
+    {
         bool foundhead = false;
         var children = GetChildren();
         for (int i = 0; i < children.Length; i++)
@@ -51,11 +55,11 @@ public class GeneralCharacter : MonoBehaviour
             {
                 foundhead = true;
                 headrb = allchildren[i].GetComponent<Rigidbody>();
-                Debug.Log(allchildren[i].name);
+                //Debug.Log(allchildren[i].name);
             }
             if (allchildren[i].CompareTag("limb"))
             {
-                limbs.Add(allchildren[i].gameObject);
+                limbs.Add(allchildren[i].GetComponent<CatchCollision>());
             }
         }
         //Debug.Log("Limbs layer count: " + limbs.Count);
@@ -69,9 +73,9 @@ public class GeneralCharacter : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if(started && !finished)
+        if (started && !finished)
         {
-            for(int i =0; i< GetRigidBodies().Count;i++)
+            for (int i = 0; i < GetRigidBodies().Count; i++)
             {
                 //Debug.Log(name + " " + allrigidbodies[i].name + " " + "Velocity = " + allrigidbodies[i].velocity);
                 //Debug.Log(name + " " + allrigidbodies[i].name + " " + "Ang Velocity = " + allrigidbodies[i].angularVelocity);
@@ -108,6 +112,13 @@ public class GeneralCharacter : MonoBehaviour
         }
 
     }*/
+
+    public float GetHeadY()
+    {
+        //Debug.Log(headrb);
+        return headrb.transform.position.y;
+    }
+
     public List<Rigidbody> GetRigidBodies()
     {
         if (allrigidbodies.Count == 0)
@@ -137,8 +148,7 @@ public class GeneralCharacter : MonoBehaviour
         bool result = false;
         for (var i = 0; i < limbs.Count; i++)
         {
-            CatchCollision c = limbs[i].GetComponent<CatchCollision>();
-            if (c.grounded)
+            if (limbs[i].grounded)
             {
                 result = true;
                 break;
@@ -149,7 +159,10 @@ public class GeneralCharacter : MonoBehaviour
     void HorizontalMovement(Rigidbody rb, Vector3 horizontalforces, Vector3 torque)
     {
         rb.AddTorque(torque*Time.fixedDeltaTime,ForceMode.Impulse);
-        rb.AddForce(Vector3.Scale(new Vector3(1 * Time.fixedDeltaTime, 1*Time.fixedDeltaTime, 1 * Time.fixedDeltaTime), horizontalforces), ForceMode.Impulse);
+        if (IsGrounded())
+        {
+            rb.AddForce(Vector3.Scale(new Vector3(1 * Time.fixedDeltaTime, 1 * Time.fixedDeltaTime, 1 * Time.fixedDeltaTime), horizontalforces), ForceMode.Impulse);
+        }
     }
     void VerticalMovement(Rigidbody rb, float verticalforce)
     {
