@@ -2,13 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Video;
 using Random = UnityEngine.Random;
-using UnityEngine.SceneManagement;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-using System.Reflection;
+
 
 public class PopulationControlller : MonoBehaviour
 {
@@ -182,7 +177,6 @@ public class PopulationControlller : MonoBehaviour
     }
     public void ResetState()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
         //Debug.Break();
         /* Destroy(origin);

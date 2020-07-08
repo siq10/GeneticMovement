@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GeneticAlg : MonoBehaviour
 {
@@ -13,6 +14,14 @@ public class GeneticAlg : MonoBehaviour
     public Transform DesiredLocation;
     public GeneticOperationsController GeneticOperationsComponent;
     public int NumberOfIterations = 20;
+
+    private void Awake()
+    {
+        if(MenuController.IsReplayRun == true)
+        {
+            gameObject.SetActive(false);
+        }
+    }
     private void SetRefs()
     {
         EvalComponent.SetPopulation(PopulationComponent.GetPopulation());
@@ -46,8 +55,15 @@ public class GeneticAlg : MonoBehaviour
     }
     private void ResetState()
     {
-        PopulationComponent.ResetState();
+        //PopulationComponent.ResetState();
         EvalComponent.ResetState();
+        List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> CurrentPopulationDNA;
+        List<float> scorelist = new List<float>();
+       // ReplUtils.LoadSimmulation("save0", out CurrentPopulationDNA, out scorelist);
+        //PopulationComponent.SetDNA(CurrentPopulationDNA);
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
     }
 
     IEnumerator Coordinate()
@@ -62,6 +78,8 @@ public class GeneticAlg : MonoBehaviour
             {
                 yield return new WaitForSeconds(1f);
             }
+            ReplUtils.SaveSimmulation(PopulationComponent.GetPopulationDNA(), EvalComponent.GetFitnessList());
+
             GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList(),out DnaFromNextGen);
             PopulationComponent.SetDNA(DnaFromNextGen);
             ResetState();

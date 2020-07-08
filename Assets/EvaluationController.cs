@@ -94,9 +94,9 @@ public class EvaluationController : MonoBehaviour
                 var NormalizedDistanceToFinish = GetNormalizedValue(DistanceToFinish, 0f, DistanceFromStartToFinish);
                 
                 var DistanceBetweenYs= Mathf.Abs(PopulationReference[j].GetHeadY() - headposY);
-                var NormalizedHeadPosition =  GetNormalizedValue(DistanceBetweenYs, 0f, headposY);
+                var NormalizedHeadDistanceFromOptimal =  GetNormalizedValue(DistanceBetweenYs, 0f, headposY);
 
-                IndividualFitnessList[j] += (1f - NormalizedDistanceToFinish) * 0f + (1f - NormalizedHeadPosition)*1f;
+                IndividualFitnessList[j] += (1f - NormalizedDistanceToFinish) * 0f + (1f - NormalizedHeadDistanceFromOptimal) *1f;
                 if (IndividualFitnessList[j] > IndividualFitnessList[bestsmithindex])
                 {
                     bestsmithindex = j;
