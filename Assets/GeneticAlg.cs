@@ -28,12 +28,15 @@ public class GeneticAlg : MonoBehaviour
         EvalComponent.SetDestination(DesiredLocation);
         EvalComponent.SetDistanceFromStartToEnd(Vector3.Distance(InitialLocation.position, DesiredLocation.position));
         GeneticOperationsComponent.SetPopulationDNA(PopulationComponent.GetPopulationDNA());
+        PopulationComponent.SetEliteCount(GeneticOperationsComponent.EliteCount);
+        PopulationComponent.SetSimCounter(simcounter);
     }
     // Start is called before the first frame update
     void Start()
     {
         SetRefs();
         StartCoroutine("Coordinate");
+
 
     }
 
@@ -59,7 +62,7 @@ public class GeneticAlg : MonoBehaviour
         EvalComponent.ResetState();
         List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> CurrentPopulationDNA;
         List<float> scorelist = new List<float>();
-       // ReplUtils.LoadSimmulation("save0", out CurrentPopulationDNA, out scorelist);
+        //ReplUtils.LoadSimmulation("save0", out CurrentPopulationDNA, out scorelist);
         //PopulationComponent.SetDNA(CurrentPopulationDNA);
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -71,9 +74,10 @@ public class GeneticAlg : MonoBehaviour
         while (simcounter < NumberOfIterations)
         {
             GeneticOperationsComponent.SetPopulationDNA(PopulationComponent.GetPopulationDNA());
-            List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> DnaFromNextGen = new List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>>();
+            List< List<List<Vector3>>> DnaFromNextGen = new List< List<List<Vector3>>>();
             StartSimulation();
             EvalComponent.SetHeadPositionY(PopulationComponent.GetHeadPositionY());
+            EvalComponent.SetFootPositionY(PopulationComponent.GetFootPositionY());
             while (! EvalComponent.done)
             {
                 yield return new WaitForSeconds(1f);

@@ -6,8 +6,11 @@ using UnityEngine.SceneManagement;
 
 public class ReplayController : MonoBehaviour
 {
-    private static List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> ReplayDNA;
+
     private static List<float> ScoreList;
+    private static int charindex = 0;
+    public PopulationControlller PopulationComponent;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -16,17 +19,38 @@ public class ReplayController : MonoBehaviour
             gameObject.SetActive(false);
         }
     }
+    private void Start()
+    {
+        if(MenuController.IsReplayRun == true)
+        {
+            PopulationComponent.StartMovement(charindex);
+        }
+
+    }
+    public int GetIndex()
+    {
+        return charindex;
+    }
 
     // Update is called once per frame
     void Update()
     {
 
     }
-
+    public void ChangeCandidate(int direction)
+    {
+        charindex += direction;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        /*SetupCharacter();
+        ResetCharacter();
+        character.SetActive(true);
+        individual.Act();*/
+    }
     public void LoadReplay(string name)
     {
-        ReplUtils.LoadSimmulation(name, out ReplayDNA, out ScoreList);
-        Debug.Log(ReplayDNA.Count);
+        List<List<List<Vector3>>> data;
+        ReplUtils.LoadSimmulation(name, out data, out ScoreList);
+        PopulationComponent.SetDNA(data);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

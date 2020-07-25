@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 public class PopulationControlller : MonoBehaviour
 {
     public GameObject CharacterType = null;
-    public int PopulationSize = 50;
+    public int PopulationSize;
     public int MaxRunTime = 20;
     public int AppliedStimulusCount = 500;
     private List<GeneralCharacter> Population = new List<GeneralCharacter>();
@@ -16,7 +16,8 @@ public class PopulationControlller : MonoBehaviour
     public List<Vector3> Positions;
     public List<Quaternion> Rotations;
     private GameObject origin = null;
-
+    private int EliteCount;
+    private int SimCounter;
 
     /*
      * List of tuples, each tuple belongs to an individual and contains:
@@ -25,122 +26,81 @@ public class PopulationControlller : MonoBehaviour
      * 3) All the torque motion for the current simmulation - as a List of Lists of Vector3s;
      * Size - x individuals(tuples) * y frames * z rigidbodies * 1 force
     */
-    private static List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> CurrentPopulationDNA = new List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>>();
+    //private static List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> CurrentPopulationDNA = new List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>>();
 
+    /*
+     * List 1 - Contains individuals - 50,100,etc
+     * List 2 - Contains each frame - 500, etc
+     * List 3 - Contains each RigidBody torque applied - 17 rbs per individual.
+     */
+    private static List< List<List<Vector3>>> CurrentPopulationDNA = new List< List<List<Vector3>>>();
 
     // -- GeneticAlg 
     public bool done = false;
     // -- 
+
+    public void SetEliteCount(int elites)
+    {
+        EliteCount = elites;
+    }
+    public void SetSimCounter(int simcounter)
+    {
+        SimCounter = simcounter;
+    }
     private void InitPopulation()
     {
         origin = Instantiate(CharacterType, InitialLocation.position, Quaternion.identity);
         origin.SetActive(false);
         for (int i = 0; i < PopulationSize; i++)
         {
-            GeneralCharacter individual = origin.GetComponent<GeneralCharacter>();
-
-            List<List<Vector3>> horizontalForces = new List<List<Vector3>>();
-            List<List<float>> verticalForces = new List<List<float>>();
             List<List<Vector3>> torque = new List<List<Vector3>>();
             if (CurrentPopulationDNA.Count < PopulationSize)
             {
                 // Debug.Log("Entered");
                 for (int j = 0; j < AppliedStimulusCount; j++)
                 {
-                    List<Vector3> allrbHforces = new List<Vector3>();
-                    List<float> allrbVforces = new List<float>();
                     List<Vector3> allrbTorque = new List<Vector3>();
                     for (int k = 0; k < 17; k++)
                     {
-                        allrbHforces.Add(new Vector3(UnityEngine.Random.Range(-1000f, 1000f),
-                            UnityEngine.Random.Range(-100f, 100f),
-                            UnityEngine.Random.Range(-1000f, 1000f)));
-                        allrbVforces.Add(UnityEngine.Random.Range(-1000f, 1000f));
                         allrbTorque.Add(new Vector3(
-                            UnityEngine.Random.Range(-10f, 10f),
-                            UnityEngine.Random.Range(-10f, 10f),
-                            UnityEngine.Random.Range(-10f, 10f)));
+                            UnityEngine.Random.Range(-5, 5f),
+                            UnityEngine.Random.Range(-5f, 5f),
+                            UnityEngine.Random.Range(-5f, 5f)));
                     }
-                    horizontalForces.Add(allrbHforces);
-                    verticalForces.Add(allrbVforces);
                     torque.Add(allrbTorque);
                 }
-                var tuple = new Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>(horizontalForces, verticalForces, torque);
-                CurrentPopulationDNA.Add(tuple);
+                CurrentPopulationDNA.Add(torque);
             }
-            GameObject obj = CreateAndPrepare(CurrentPopulationDNA[i].Item1, CurrentPopulationDNA[i].Item2, CurrentPopulationDNA[i].Item3);
+            GameObject obj = CreateAndPrepare(CurrentPopulationDNA[i]);
             obj.name = "Smith" + i;
             obj.transform.SetParent(transform);
 
             Population.Add(obj.GetComponent<GeneralCharacter>());
         }
-        /*List<float> values = new List<float>(50 * 500 * (17 + 51 + 51));
-        foreach (var tup in CurrentPopulationDNA)
-        {
-            var t1 = tup.Item1;
-            var t2 = tup.Item2;
-            var t3 = tup.Item3;
-            foreach (var x in t1)
-            {
-                foreach (var y in x)
-                {
-                    values.Add(y.x);
-                    values.Add(y.y);
-                    values.Add(y.z);
-                }
-            }
-            foreach (var x in t2)
-            {
-                values.AddRange(x);
-            }
-            foreach (var x in t3)
-            {
-                foreach (var y in x)
-                {
-                    values.Add(y.x);
-                    values.Add(y.y);
-                    values.Add(y.z);
-                }
-            }
-        }*/
-        /*BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Open(Application.dataPath + "/file1.txt", FileMode.Create);
-        bf.Serialize(file, values);
-        file.Close();*/
-        /* StreamWriter writer = new StreamWriter(Application.dataPath + "/file.txt", false);
-         writer.WriteLine(PrintDNA());
-         writer.Close();
-        */
         Debug.Log("InitPopulation Done");
     }
     private string PrintDNA()
     {
         string result = "";
         int i = 0;
-        foreach (var tup in CurrentPopulationDNA)
+        foreach (var list in CurrentPopulationDNA)
         {
             result += ("\n" + "Smith" + i + "\n");
             string h = "";
-            string v = "";
-            string t = "";
             for (int j = 0; j < AppliedStimulusCount; j++)
             {
-                h += ("[" + String.Join(",", tup.Item1[j]) + "] ");
-                v += ("[" + String.Join(",", tup.Item2[j]) + "] ");
-                t += ("[" + String.Join(",", tup.Item3[j]) + "] ");
+                h += ("[" + String.Join(",", list[j]) + "]");
             }
-            result += (h + "\n" + v + "\n" + t);
+            result += (h + "\n");
             i++;
         }
         return result;
     }
-    private GameObject CreateAndPrepare(List<List<Vector3>> h, List<List<float>> v, List<List<Vector3>> t)
+    private GameObject CreateAndPrepare( List<List<Vector3>> t)
     {
-        GameObject obj = Instantiate(origin);
-        obj.transform.SetParent(transform);
-        obj.name = "Smith";
+        GameObject obj = Instantiate(origin, InitialLocation.position, Quaternion.identity);
         GeneralCharacter individual = obj.GetComponent<GeneralCharacter>();
-        individual.SetDNA(h, v, t);
+        individual.SetDNA(t);
         individual.SetChromosomeLength(AppliedStimulusCount);
         individual.stage = 0;
         return obj;
@@ -151,23 +111,18 @@ public class PopulationControlller : MonoBehaviour
         //Random.seed = 42;   
         InitPopulation();
         IgnoreRagdollCollisions();
-
-
     }
     void Start()
     {
-        Time.timeScale = 2f;
-        var outline1 = Population[0].gameObject.AddComponent<Outline>();
+        if (SimCounter > 0)
+        for(var i = 0; i < EliteCount; i++)
+        {
+            var outline1 = Population[i].gameObject.AddComponent<Outline>();
 
-        outline1.OutlineMode = Outline.Mode.OutlineAll;
-        outline1.OutlineColor = Color.green;
-        outline1.OutlineWidth = 5f;
-
-        var outline2 = Population[1].gameObject.AddComponent<Outline>();
-
-        outline2.OutlineMode = Outline.Mode.OutlineAll;
-        outline2.OutlineColor = Color.blue;
-        outline2.OutlineWidth = 5f;
+            outline1.OutlineMode = Outline.Mode.OutlineAll;
+            outline1.OutlineColor = Color.green;
+            outline1.OutlineWidth = 3f;
+        }
     }
 
     // Update is called once per frame  
@@ -274,24 +229,37 @@ public class PopulationControlller : MonoBehaviour
     {
         return Population[0].GetHeadY();
     }
+    public float GetFootPositionY()
+    {
+        return Population[0].GetFootY();
+    }
     public List<GeneralCharacter> GetPopulation()
     {
         return Population;
     }
 
-    public void StartMovement()
+    public void StartMovement(int index = -1)
     {
-        for (int i = 0; i < Population.Count; i++)
+        if (index == -1)
         {
-            Population[i].gameObject.SetActive(true);
-            Population[i].Act();
+
+            for (int i = 0; i < PopulationSize; i++)
+            {
+                Population[i].gameObject.SetActive(true);
+                Population[i].Act();
+            }
+        }
+        else
+        {
+            Population[index].gameObject.SetActive(true);
+            Population[index].Act();
         }
     }
-    public List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> GetPopulationDNA()
+    public List<List<List<Vector3>>> GetPopulationDNA()
     {
         return CurrentPopulationDNA;
     }
-    public void SetDNA(List<Tuple<List<List<Vector3>>, List<List<float>>, List<List<Vector3>>>> DnaFromNextGen)
+    public void SetDNA(List< List<List<Vector3>>> DnaFromNextGen)
     {
         CurrentPopulationDNA = DnaFromNextGen;
     }
