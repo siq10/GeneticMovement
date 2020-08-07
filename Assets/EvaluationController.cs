@@ -9,6 +9,7 @@ public class EvaluationController : MonoBehaviour
     public List<GeneralCharacter> PopulationReference = new List<GeneralCharacter>();
     private List<float> IndividualFitnessList = new List<float>();
     private float DistanceFromStartToFinish;
+    private Transform StartPos;
     private Transform Destination;
     private int bestsmithindex;
     private float headposY;
@@ -48,9 +49,10 @@ public class EvaluationController : MonoBehaviour
     {
         footposY = posY;
     }
-    public void SetDestination(Transform target)
+    public void SetTransforms(Transform start,Transform dest)
     {
-        Destination = target;
+        StartPos = start;
+        Destination = dest;
     }
 
     public void StartEvaluation()
@@ -61,9 +63,9 @@ public class EvaluationController : MonoBehaviour
     {
         int bestsmithindex = 0;
 
-        yield return StartCoroutine(LastFrameDistanceFromDestinationFitness());
-        //yield return StartCoroutine(MediumDistanceToDestinationFitness());
-        //yield return StartCoroutine(EncourageWalkimng());
+        //yield return StartCoroutine(LastFrameDistanceFromDestinationFitness());
+        yield return StartCoroutine(MediumDistanceToDestinationFitness());
+        //yield return StartCoroutine(EncourageWalking());
 
         Debug.Log("Smith no " + bestsmithindex + " is the best");
         NotifyFinish();
@@ -92,7 +94,7 @@ public class EvaluationController : MonoBehaviour
         }
     }
 
-    IEnumerator EncourageWalkimng()
+    IEnumerator EncourageWalking()
     {
         for (int i = 0; i < 24; i++)
         {
@@ -106,9 +108,13 @@ public class EvaluationController : MonoBehaviour
                 var NormalizedHeadDistanceFromOptimal1 =  GetNormalizedValue(DistanceBetweenYs1, 0f, headposY);
 
                 var DistanceBetweenYs2 = Mathf.Abs(PopulationReference[j].GetFootY() - headposY);
-                var NormalizedHeadDistanceFromOptimal2 = GetNormalizedValue(DistanceBetweenYs2, 0f, headposY);
-
-                IndividualFitnessList[j] += (1f - NormalizedDistanceToFinish) * 0f + (1f - NormalizedHeadDistanceFromOptimal1) * 1f ;
+                var Normalized_YDistanceBetweenHeadAndFoot = GetNormalizedValue(DistanceBetweenYs2, 0f, headposY);
+                if(PopulationReference[j].GetFootY() > PopulationReference[j].GetHeadY())
+                {
+                    Normalized_YDistanceBetweenHeadAndFoot = 0;
+                    NormalizedHeadDistanceFromOptimal1 = 1;
+                }
+                IndividualFitnessList[j] += (1f - NormalizedDistanceToFinish) * 0f + Normalized_YDistanceBetweenHeadAndFoot * 0f + (1 - NormalizedHeadDistanceFromOptimal1) * 1f ;
                // IndividualFitnessList[j] += (1f - NormalizedDistanceToFinish) * 0f + (1f - NormalizedHeadDistanceFromOptimal1) * 0.5f + (1f - NormalizedHeadDistanceFromOptimal2) * 0.5f;
 
                 if (IndividualFitnessList[j] > IndividualFitnessList[bestsmithindex])
@@ -122,33 +128,36 @@ public class EvaluationController : MonoBehaviour
         for (int j = 0; j < IndividualFitnessList.Count; j++)
         {
             IndividualFitnessList[j] /= 24f;
+
         }
     }
 
     IEnumerator MediumDistanceToDestinationFitness()
     {
-        for (int i = 0; i < 12; i++)
+        var DistanceFromStartToFinish = Vector3.Distance(StartPos.position, Destination.position);
+        for (int i = 0; i < 24; i++)
         {
             bestsmithindex = 0;
             for (int j = 0; j < IndividualFitnessList.Count; j++)
             {
                 var DistanceToFinish = Vector3.Distance(PopulationReference[j].GetRigidBodies()[0].position, Destination.position);
+                var DistanceFromStart = Vector3.Distance(PopulationReference[j].GetRigidBodies()[0].position, StartPos.position);
+                
                 var NormalizedDistanceToFinish = GetNormalizedValue(DistanceToFinish, 0f, DistanceFromStartToFinish);
-
-                IndividualFitnessList[j] += (1 - NormalizedDistanceToFinish);
+                var NormalizedDistanceFromStart = GetNormalizedValue(DistanceFromStart, 0f, DistanceFromStartToFinish);
+                IndividualFitnessList[j] += ((1 - NormalizedDistanceToFinish) * 1f); //+ (NormalizedDistanceFromStart) * 0f);
                 if (IndividualFitnessList[j] > IndividualFitnessList[bestsmithindex])
                 {
                     bestsmithindex = j;
                 }
                 //.Log("Measured" + (i+1) + " - smith" + j + " value " + Vector3.Distance(PopulationReference[j].GetRigidBodies()[0].position, Destination.position));
-
             }
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
         }
         for (int j = 0; j < IndividualFitnessList.Count; j++)
         {
-            IndividualFitnessList[j] /= 12f;
+            IndividualFitnessList[j] /= 24f;
         }
     }
     public void SetDistanceFromStartToEnd(float dist)

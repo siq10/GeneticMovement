@@ -25,7 +25,7 @@ public class GeneticAlg : MonoBehaviour
     private void SetRefs()
     {
         EvalComponent.SetPopulation(PopulationComponent.GetPopulation());
-        EvalComponent.SetDestination(DesiredLocation);
+        EvalComponent.SetTransforms(InitialLocation,DesiredLocation);
         EvalComponent.SetDistanceFromStartToEnd(Vector3.Distance(InitialLocation.position, DesiredLocation.position));
         GeneticOperationsComponent.SetPopulationDNA(PopulationComponent.GetPopulationDNA());
         PopulationComponent.SetEliteCount(GeneticOperationsComponent.EliteCount);
@@ -35,8 +35,11 @@ public class GeneticAlg : MonoBehaviour
     void Start()
     {
         SetRefs();
-        StartCoroutine("Coordinate");
-
+        if (simcounter < NumberOfIterations)
+        {
+            Debug.Log("started step " + simcounter);
+            StartCoroutine("Coordinate");
+        }
 
     }
 
@@ -68,27 +71,34 @@ public class GeneticAlg : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
     }
+    bool ReadyToGo()
+    {
+
+        return PopulationComponent.ready;
+    }
 
     IEnumerator Coordinate()
     {
-        while (simcounter < NumberOfIterations)
+        GeneticOperationsComponent.SetPopulationDNA(PopulationComponent.GetPopulationDNA());
+        List<List<List<Vector3>>> DnaFromNextGen = new List<List<List<Vector3>>>();
+        while(!ReadyToGo())
         {
-            GeneticOperationsComponent.SetPopulationDNA(PopulationComponent.GetPopulationDNA());
-            List< List<List<Vector3>>> DnaFromNextGen = new List< List<List<Vector3>>>();
-            StartSimulation();
-            EvalComponent.SetHeadPositionY(PopulationComponent.GetHeadPositionY());
-            EvalComponent.SetFootPositionY(PopulationComponent.GetFootPositionY());
-            while (! EvalComponent.done)
-            {
-                yield return new WaitForSeconds(1f);
-            }
-            ReplUtils.SaveSimmulation(PopulationComponent.GetPopulationDNA(), EvalComponent.GetFitnessList());
-
-            GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList(),out DnaFromNextGen);
-            PopulationComponent.SetDNA(DnaFromNextGen);
-            ResetState();
-            simcounter++;
+            yield return null;
         }
+        StartSimulation();
+        EvalComponent.SetHeadPositionY(PopulationComponent.GetHeadPositionY());
+        EvalComponent.SetFootPositionY(PopulationComponent.GetFootPositionY());
+            
+        while (! EvalComponent.done)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+        ReplUtils.SaveSimmulation(PopulationComponent.GetPopulationDNA(), EvalComponent.GetFitnessList());
+
+        GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList(),out DnaFromNextGen);
+        PopulationComponent.SetDNA(DnaFromNextGen);
+        ResetState();
+        simcounter++;
 
     }
 }

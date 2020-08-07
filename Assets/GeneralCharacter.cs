@@ -201,8 +201,8 @@ public class GeneralCharacter : MonoBehaviour
     }*/
     void Move(Rigidbody rb, Vector3 torque)
     {
-        rb.AddTorque(torque*100, ForceMode.Force);
-        //rb.AddTorque(new Vector3(1, 0, 0) * Power, ForceMode.Impulse);
+        //rb.AddTorque(torque, ForceMode.Impulse);
+        rb.AddTorque(torque * Power, ForceMode.Impulse);
 
     }
     /*void VerticalMovement(Rigidbody rb, float verticalforce)

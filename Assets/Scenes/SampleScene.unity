@@ -664,7 +664,7 @@ MonoBehaviour:
   InitialLocation: {fileID: 579207449}
   DesiredLocation: {fileID: 2074655990}
   GeneticOperationsComponent: {fileID: 1481121792}
-  NumberOfIterations: 50
+  NumberOfIterations: 100
 --- !u!4 &133277204
 Transform:
   m_ObjectHideFlags: 0
@@ -4509,7 +4509,7 @@ MonoBehaviour:
   SelectMethod: 0
   Elitism: 1
   EliteCount: 10
-  MutationRate: 0.02
+  MutationRate: 0.002
 --- !u!4 &1481121793
 Transform:
   m_ObjectHideFlags: 0

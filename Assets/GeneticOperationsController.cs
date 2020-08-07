@@ -37,9 +37,6 @@ public class GeneticOperationsController : MonoBehaviour
 
     public List<int> Select(List<float> FitnessList)
     {
-        //Debug.Log("Fitnesslist has " + FitnessList.Count + " values.");
-        //Debug.Log(String.Join(", ", FitnessList));
-
         List<int> indexes = new List<int>();
         switch(SelectMethod)
         {
@@ -78,18 +75,21 @@ public class GeneticOperationsController : MonoBehaviour
     }
     public void ComputeNextGeneration(List<float> FitnessList, out List<List<List<Vector3>>> NewDna )
     {
+        //Debug.Log("Fitnesslist has " + FitnessList.Count + " values.");
+        //Debug.Log("Fitness: " + String.Join(", ", FitnessList));
+
         PhysicsSteps = PopulationDNA[0].Count;
         RigidBodiesPerIndividual = PopulationDNA[0][0].Count;
         List<List<List<Vector3>>> NewDNA = new List<List<List<Vector3>>>();
         var halfpopsize = FitnessList.Count / 2;
 
         List<int> survivors = Select(FitnessList);
-        /*foreach(var x in PopulationDNA)
+        /*foreach (var x in PopulationDNA)
         {
-            NewDNA.Add(PopulationDNA[0]);
+            NewDNA.Add(x);
         }*/
 
-        for(int i= 0; i< halfpopsize ;i++)
+        for (int i= 0; i< halfpopsize ;i++)
         {
             var parent1index = survivors[Random.Range(0, survivors.Count)];
             var parent2index = survivors[Random.Range(0, survivors.Count)];
@@ -98,7 +98,8 @@ public class GeneticOperationsController : MonoBehaviour
         }
         for(int j = 0; j< NewDNA.Count;j++)
         {
-            Mutation(j, NewDNA);
+            //Mutation_RigidBody(j, NewDNA);
+            Mutation_WholePhysicsStep(j, ref NewDNA);
         }
 
         // Elitism - preserving the best x individuals from the current generation.
@@ -251,7 +252,7 @@ public class GeneticOperationsController : MonoBehaviour
         return result;
     }
 
-    public void Mutation(int charindex, List< List<List<Vector3>>> NewDNA)
+    public void Mutation_RigidBody(int charindex,ref List< List<List<Vector3>>> NewDNA)
     {
         var chance = 0f;
         for (int affected_step = 0; affected_step < PhysicsSteps; affected_step++)
@@ -260,12 +261,38 @@ public class GeneticOperationsController : MonoBehaviour
             var len = torque_list.Count;
             for (int i = 0; i < len; i++)
             {
+
                 chance = Random.Range(0f, 1f);
                 if (chance < MutationRate)
                 {
-                    Debug.Log("Smith" + charindex + " mutated gene " + affected_step);
-                    torque_list[i] = (new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f), Random.Range(-5f, 5f)));
+                   // Debug.Log("Smith" + charindex + " mutated gene " + affected_step);
+                    torque_list[i] = (new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)));
+                    /*var a = torque_list.SequenceEqual(NewDNA[charindex][affected_step]);
+
+                    if (a==false)
+                    {
+                        Debug.LogError("not the same");
+
+                    }*/
                 }
+            }
+        }
+    }
+    public void Mutation_WholePhysicsStep(int charindex, ref List<List<List<Vector3>>> NewDNA)
+    {
+        var chance = 0f;
+        for (int affected_step = 0; affected_step < PhysicsSteps; affected_step++)
+        {
+            chance = Random.Range(0f, 1f);
+            if (chance < MutationRate)
+            {
+                var torque_list = NewDNA[charindex][affected_step];
+                var len = torque_list.Count;
+                for (int i = 0; i < len; i++)
+                {
+                    torque_list[i] = (new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)));
+                }
+                //Debug.Log("Smith" + charindex + " mutated gene " + affected_step);
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 
@@ -18,6 +19,7 @@ public class PopulationControlller : MonoBehaviour
     private GameObject origin = null;
     private int EliteCount;
     private int SimCounter;
+    public bool ready = false;
 
     /*
      * List of tuples, each tuple belongs to an individual and contains:
@@ -49,35 +51,43 @@ public class PopulationControlller : MonoBehaviour
     }
     private void InitPopulation()
     {
-        origin = Instantiate(CharacterType, InitialLocation.position, Quaternion.identity);
-        origin.SetActive(false);
-        for (int i = 0; i < PopulationSize; i++)
+        if (CurrentPopulationDNA.Count < PopulationSize)
         {
-            List<List<Vector3>> torque = new List<List<Vector3>>();
-            if (CurrentPopulationDNA.Count < PopulationSize)
+            for (int i = 0; i < PopulationSize; i++)
             {
-                // Debug.Log("Entered");
+                List<List<Vector3>> torque = new List<List<Vector3>>();
+                //Debug.Log("Entered");
                 for (int j = 0; j < AppliedStimulusCount; j++)
                 {
                     List<Vector3> allrbTorque = new List<Vector3>();
                     for (int k = 0; k < 17; k++)
                     {
                         allrbTorque.Add(new Vector3(
-                            UnityEngine.Random.Range(-5, 5f),
-                            UnityEngine.Random.Range(-5f, 5f),
-                            UnityEngine.Random.Range(-5f, 5f)));
+                            UnityEngine.Random.Range(-1, 1f),
+                            UnityEngine.Random.Range(-1f, 1f),
+                            UnityEngine.Random.Range(-1f, 1f)));
                     }
                     torque.Add(allrbTorque);
                 }
                 CurrentPopulationDNA.Add(torque);
             }
-            GameObject obj = CreateAndPrepare(CurrentPopulationDNA[i]);
-            obj.name = "Smith" + i;
-            obj.transform.SetParent(transform);
-
-            Population.Add(obj.GetComponent<GeneralCharacter>());
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
-        Debug.Log("InitPopulation Done");
+        else
+        {
+            for (int i = 0; i < PopulationSize; i++)
+            {
+                origin = Instantiate(CharacterType, InitialLocation.position, Quaternion.identity);
+                origin.SetActive(false);
+                GameObject obj = CreateAndPrepare(CurrentPopulationDNA[i]);
+                obj.name = "Smith" + i;
+                obj.transform.SetParent(transform);
+
+                Population.Add(obj.GetComponent<GeneralCharacter>());
+            }
+            Debug.Log("InitPopulation Done");
+            ready = true;
+        }
     }
     private string PrintDNA()
     {
@@ -108,7 +118,7 @@ public class PopulationControlller : MonoBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
-        //Random.seed = 42;   
+        //Random.InitState(42);   
         InitPopulation();
         IgnoreRagdollCollisions();
     }
@@ -213,7 +223,7 @@ public class PopulationControlller : MonoBehaviour
             }
         }
         */
-
+        if(Population.Count>0)
         for (int i = 0; i < PopulationSize; i++)
         {
             List<Collider> collidersforI = Population[i].GetAllColliders();
@@ -240,6 +250,7 @@ public class PopulationControlller : MonoBehaviour
 
     public void StartMovement(int index = -1)
     {
+        ready = true;
         if (index == -1)
         {
 
