@@ -44,3 +44,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: SORTING
+    uniqueID: 1437480213
+    locked: 0
+  - name: New Layer
+    uniqueID: 2639123049
+    locked: 0
