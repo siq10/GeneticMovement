@@ -9,30 +9,37 @@ public static class ReplUtils
     public static int populationsize = 100;
     public static int steps = 500;
     public static int filecount = 0;
-    public static int last = 0;
-    public static void SaveSimmulation(List<List<List<Vector3>>> CurrentPopulationDNA, List<float> scorelist)
+    public static string assignedfolderpath;
+    public static void AssignCurrentFolder(string path)
+    {
+        assignedfolderpath = path;
+    }
+    public static void SaveSimmulation(List<List<List<Vector3>>> CurrentPopulationDNA, List<float> scorelist, int simcount)
     {
         var values = ConvertToSerializable(CurrentPopulationDNA);
-        GetSaveFiles();
+        //GetSaveFiles();
         SaveData data = new SaveData(values, scorelist);
         BinaryFormatter bf = new BinaryFormatter();
-        Debug.Log("Saved in " + "save" + (filecount + last) % 5);
-        FileStream file = File.Open(Path.Combine(Application.persistentDataPath, "save" + (filecount+last)%5), FileMode.Create);
+        Debug.Log("Saved in " + "save" + simcount);
+        FileStream file = File.Open(Path.Combine(Application.persistentDataPath,assignedfolderpath, "" + simcount), FileMode.Create);
         bf.Serialize(file, data);
         file.Close();
-        last = (last + 1) % 5;
     }
 
-    public static List<string> GetSaveFiles()
+    public static string[] GetFolderNames()
     {
-        var saveslist = Directory.GetFiles(Application.persistentDataPath);
+        var folders = Directory.GetDirectories(Application.persistentDataPath);
+        return folders;
+    }
+    public static List<string> GetSaveFileNames(string folderpath)
+    {
+        var saveslist = Directory.GetFiles(folderpath);
         List<string> filenames = new List<string>();
         foreach (var x in saveslist)
         {
             filenames.Add(Path.GetFileName(x));
         }
-        filenames = filenames.FindAll(s => s.Contains("save"));
-        filecount = filenames.Count;
+        //filenames = filenames.FindAll(s => s.Contains("save"));
         return filenames;
     }
     public static List<float> ConvertToSerializable(List<List<List<Vector3>>> CurrentPopulationDNA)
@@ -53,11 +60,10 @@ public static class ReplUtils
         return values;
     }
 
-    public static void LoadSimmulation(string filename, out List<List<List<Vector3>>> CurrentPopulationDNA, out List<float> scorelist)
+    public static void LoadSimmulation(string path, out List<List<List<Vector3>>> CurrentPopulationDNA, out List<float> scorelist)
     {
         CurrentPopulationDNA = new List<List<List<Vector3>>>();
         scorelist = new List<float>();
-        string path = Path.Combine(Application.persistentDataPath, filename);
         if (File.Exists(path))
         {
             BinaryFormatter formatter = new BinaryFormatter();

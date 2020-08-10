@@ -51,6 +51,7 @@ public class PopulationControlller : MonoBehaviour
     }
     private void InitPopulation()
     {
+        //Debug.LogError(ReplUtils.GetFolderNmaes()[0]) ;
         if (CurrentPopulationDNA.Count < PopulationSize)
         {
             for (int i = 0; i < PopulationSize; i++)

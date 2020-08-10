@@ -40,7 +40,21 @@ public class GeneralCharacter : MonoBehaviour
     {
         ChromosomeLength = length;
     }
-
+    public Transform GetSpine()
+    {
+        var children = GetChildren();
+        var index = -1;
+        /*for (int i = 0 ; i < children.Length;i++)
+        {
+            if (children[i].name == "Spine")
+            {
+                index = i;
+                break;
+            }
+        }*/
+        //Debug.LogError(index);
+        return children[22];
+    }
     void Start()
     {
         var rbs = GetRigidBodies();
@@ -60,6 +74,7 @@ public class GeneralCharacter : MonoBehaviour
     }
     private void Awake()
     {
+
         bool foundhead = false;
         var children = GetChildren();
         var x = new List<int>();

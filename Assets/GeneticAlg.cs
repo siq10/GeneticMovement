@@ -93,12 +93,11 @@ public class GeneticAlg : MonoBehaviour
         {
             yield return new WaitForSeconds(0.5f);
         }
-        ReplUtils.SaveSimmulation(PopulationComponent.GetPopulationDNA(), EvalComponent.GetFitnessList());
+        ReplUtils.SaveSimmulation(PopulationComponent.GetPopulationDNA(), EvalComponent.GetFitnessList(),simcounter);
 
         GeneticOperationsComponent.ComputeNextGeneration(EvalComponent.GetFitnessList(),out DnaFromNextGen);
         PopulationComponent.SetDNA(DnaFromNextGen);
         ResetState();
         simcounter++;
-
     }
 }

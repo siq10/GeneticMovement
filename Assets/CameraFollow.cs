@@ -10,12 +10,12 @@ public class CameraFollow : MonoBehaviour
     private Vector3 velocity = Vector3.zero;
     private void FixedUpdate()
     {
-       /* 
+       
         Vector3 desiredPosition = target.position + offset;
         Vector3 smoothedPostion = Vector3.SmoothDamp(transform.position, desiredPosition,ref velocity, smoothTime * Time.deltaTime);
         transform.position = smoothedPostion;
 
         transform.LookAt(target);
-       */
+       
     }
 }

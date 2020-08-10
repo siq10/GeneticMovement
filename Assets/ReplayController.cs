@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class ReplayController : MonoBehaviour
 {
-
+    public CameraFollow SpecialCam;
     private static List<float> ScoreList;
     private static int charindex = 0;
     public PopulationControlller PopulationComponent;
@@ -23,6 +23,8 @@ public class ReplayController : MonoBehaviour
     {
         if(MenuController.IsReplayRun == true)
         {
+            SpecialCam.enabled = true;
+            SpecialCam.target = PopulationComponent.GetPopulation()[charindex].GetSpine();
             PopulationComponent.StartMovement(charindex);
         }
 

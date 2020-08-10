@@ -1,32 +1,36 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.WSA;
 
 public class MenuController : MonoBehaviour
 {
     // Start is called before the first frame update
     private static MenuController instance = null;
-    public Button LoadButton, ResumeButton, LeftArrow, RightArrow;
+    public Button LoadButton, ResumeButton, LeftArrow, RightArrow,BackToFolderView;
     public Slider SpeedSlider;
     public GameObject SavePanel;
-    public List<Button> SaveButtonList = new List<Button>();
+    public GameObject ItemsWindow;
     public ReplayController ReplayComponent;
     public static bool IsReplayRun = false;
     public static float speed = 1;
+    public List<GameObject> FileItems;
+    public List<GameObject> FolderItems;
+    public GameObject FolderIcon;
+    public GameObject FileIcon;
+    private string CurrentFolderPath;
     private void Awake()
     {
-  
-      
-        
+
+
+
     }
     void Start()
     {
         Init();
-
         ResetMenus();
         if (IsReplayRun)
         {
@@ -35,13 +39,20 @@ public class MenuController : MonoBehaviour
         else
         {
             TriggerGeneralMenu();
+            CreateCurrentFolder();
         }
     }
-
+    private void CreateCurrentFolder()
+    {
+        string uniquename = Guid.NewGuid().ToString();
+        string path = Path.Combine(UnityEngine.Application.persistentDataPath, uniquename);
+        Directory.CreateDirectory(path);
+        ReplUtils.AssignCurrentFolder(path);
+    }
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     private void GoBackToSim()
     {
@@ -51,14 +62,96 @@ public class MenuController : MonoBehaviour
         Time.timeScale = speed;
     }
 
+    private void HideFolderIcons()
+    {
+        for (int i = 0; i < FolderItems.Count; i++)
+        {
+            FolderItems[i].SetActive(false);
+        }
+    }
+    private void RemoveFileIcons()
+    {
+        for (int i = 0; i < FileItems.Count; i++)
+        {
+            Destroy(FileItems[i]);
+        }
+        FileItems.Clear();
+    }
+    private void PopulateFileList(string folderpath)
+    {
+        List<string> filenames = ReplUtils.GetSaveFileNames(folderpath);
+        if (folderpath != CurrentFolderPath)
+        {
+            RemoveFileIcons();
+            for (int i = 0; i < filenames.Count; i++)
+            {
+                GameObject file = Instantiate(FileIcon, ItemsWindow.transform);
+                var textcomponent = file.GetComponentInChildren<TMP_Text>();
+                textcomponent.text += filenames[i];
+                file.GetComponentInChildren<Button>().onClick.AddListener(delegate {
+                    IsReplayRun = true;
+                    Time.timeScale = speed;
+                    ReplayComponent.LoadReplay(Path.Combine(folderpath, textcomponent.text));
+                });
+                FileItems.Add(file);
+            }
+            CurrentFolderPath = folderpath;
+        }
+        else
+        {
+            ShowFileIcons();
+        }
+    }
+    private void ShowFileIcons()
+    {
+        foreach (var fileicon in FileItems)
+        {
+            fileicon.SetActive(true);
+        }
+    }
+    private void HideFileIcons()
+    {
+        foreach (var fileicon in FileItems)
+        {
+            fileicon.SetActive(false);
+        }
+    }
+
+    private void PopulateFolderList(string[] paths)
+    {
+            for (int i = 0; i < paths.Length; i++)
+            {
+                GameObject folder = Instantiate(FolderIcon, ItemsWindow.transform);
+                string formattedtext = Path.GetDirectoryName(paths[i]).Substring(0, 4) + "...";
+                folder.GetComponentInChildren<TMP_Text>().text = formattedtext;
+                var idx = i;
+                folder.GetComponentInChildren<Button>().onClick.AddListener(delegate
+                {
+                    HideFolderIcons();
+                    PopulateFileList(paths[idx]);
+                    BackToFolderView.interactable = true;
+                });
+                FolderItems.Add(folder);
+            }
+    }
+    private void ShowFolderIcons()
+    {
+        foreach (GameObject foldericon in FolderItems)
+        {
+            foldericon.SetActive(true);
+        }
+    }
     private void OpenLoadTab()
     {
         Time.timeScale = 0f;
-        List<string> filenames = ReplUtils.GetSaveFiles();
-        for (int i = 0; i < filenames.Count; i++)
+        if (FolderItems.Count == 0)
         {
-            SaveButtonList[i].gameObject.SetActive(true);
-            SaveButtonList[i].GetComponentInChildren<TMP_Text>().text = filenames[i];
+            string[] folderpaths = ReplUtils.GetFolderNames();
+            PopulateFolderList(folderpaths);
+        }
+        else
+        {
+            ShowFolderIcons();
         }
         SavePanel.SetActive(true);
         ResumeButton.gameObject.SetActive(true);
@@ -66,19 +159,16 @@ public class MenuController : MonoBehaviour
     }
     private void Init()
     {
+        BackToFolderView.interactable = false;
+        BackToFolderView.onClick.AddListener(delegate
+        {
+                HideFileIcons();
+                ShowFolderIcons();
+                BackToFolderView.interactable = false;
+        });
         LoadButton.onClick.AddListener(OpenLoadTab);
         ResumeButton.onClick.AddListener(GoBackToSim);
-        for (int i = 0; i < SaveButtonList.Count; i++)
-        {
-            SaveButtonList[i].gameObject.SetActive(false);
-            var idx = i;
-            SaveButtonList[i].onClick.AddListener(delegate {
-                IsReplayRun = true;
-                Time.timeScale = speed;
-                ReplayComponent.LoadReplay(SaveButtonList[idx].GetComponentInChildren<TMP_Text>().text);
-            });
-        }
-
+  
         if (ReplayComponent.GetIndex() == ReplayComponent.PopulationComponent.PopulationSize - 1)
         {
             RightArrow.interactable = false;
@@ -119,6 +209,8 @@ public class MenuController : MonoBehaviour
     {
         LeftArrow.gameObject.SetActive(true);
         RightArrow.gameObject.SetActive(true);
+        LoadButton.gameObject.SetActive(true);
+
         //SpeedSlider.gameObject.SetActive(true);
     }
     private void TriggerGeneralMenu()
