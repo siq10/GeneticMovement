@@ -11,11 +11,12 @@ public class PlatformController : MonoBehaviour
 
     private void Awake()
     {
-        //int platformcount = PopulationSize / HumansPerPlatform;
-        //for(int i = 1; i < platformcount; i++)
-        //{
-            Instantiate(PlatformTemplate, PlatformTemplate.transform.position + new Vector3(0, 0, 0), Quaternion.identity);
-        //}
+        /*int platformcount = PopulationSize / HumansPerPlatform;
+        for(int i = 1; i < platformcount; i++)
+        {
+            Instantiate(PlatformTemplate, PlatformTemplate.transform.position + new Vector3(0, i*15, 0), Quaternion.identity);
+        }*/
+        Instantiate(PlatformTemplate, PlatformTemplate.transform.position + new Vector3(0, 0, 0), Quaternion.identity);
     }
     void Start()
     {

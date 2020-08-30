@@ -9,7 +9,16 @@ public static class ReplUtils
     public static int populationsize = 100;
     public static int steps = 500;
     public static int filecount = 0;
-    public static string assignedfolderpath;
+    public static string assignedfolderpath = "";
+
+    public static bool IsCreated_Folder()
+    {
+        if (assignedfolderpath != "")
+        {
+            return true;
+        }
+        else return false;
+    }
     public static void AssignCurrentFolder(string path)
     {
         assignedfolderpath = path;
@@ -21,6 +30,7 @@ public static class ReplUtils
         SaveData data = new SaveData(values, scorelist);
         BinaryFormatter bf = new BinaryFormatter();
         Debug.Log("Saved in " + "save" + simcount);
+        Debug.Log("path2 = " + assignedfolderpath);
         FileStream file = File.Open(Path.Combine(Application.persistentDataPath,assignedfolderpath, "" + simcount), FileMode.Create);
         bf.Serialize(file, data);
         file.Close();

@@ -39,7 +39,10 @@ public class MenuController : MonoBehaviour
         else
         {
             TriggerGeneralMenu();
-            CreateCurrentFolder();
+            if(!ReplUtils.IsCreated_Folder())
+            {
+                CreateCurrentFolder();
+            }
         }
     }
     private void CreateCurrentFolder()
